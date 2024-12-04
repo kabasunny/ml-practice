@@ -10,7 +10,7 @@ from sklearn.metrics import root_mean_squared_error
 # load_diabetesを使用して糖尿病データセットを取得
 diabetes = load_diabetes()
 # 最初の2つの特徴量のみ使用
-X = diabetes.data[:, :2]  # 特徴量の指定
+X = diabetes.data[:, :10]  # 特徴量の指定
 # 1:年齢（Age）
 # 2:性別（Sex）
 # 3:BMI（Body Mass Index）
@@ -44,9 +44,9 @@ params = {
     "objective": "regression",  # 回帰問題として設定
     "metric": "rmse",  # 評価指標をRMSEに設定
     "boosting_type": "gbdt",  # 勾配ブースティングを使用
-    "num_leaves": 31,  # 葉の数を設定
-    "learning_rate": 0.05,  # 学習率を設定
-    "feature_fraction": 0.9,  # 特徴量のサブサンプリング率を設定
+    "num_leaves": 60,  # 葉の数を設定
+    "learning_rate": 0.1,  # 学習率を設定
+    "feature_fraction": 0.8,  # 特徴量のサブサンプリング率を設定
 }
 
 # Early stoppingの設定

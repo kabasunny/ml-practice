@@ -11,6 +11,7 @@ from sklearn.metrics import root_mean_squared_error
 housing = fetch_california_housing()
 # 特定の特徴量（1列目、3列目、5列目）と目標値（target）を取得
 X = housing.data[:, [0, 2, 4]]
+print(f"X.shape = {X.shape}")
 # X = housing.data 全データ取得
 # 1:MedInc（Median Income）: ブロックグループ内の世帯収入の中央値（単位：10,000ドル）
 # 2:HouseAge（House Age）: ブロックグループ内の住宅の築年数の中央値
@@ -21,6 +22,7 @@ X = housing.data[:, [0, 2, 4]]
 # 7:Latitude（Latitude）: ブロックグループの緯度
 # 8:Longitude（Longitude）: ブロックグループの経度
 y = housing.target
+print(f"y.shape = {y.shape}")
 
 # 特徴量と目標値を表示
 # print(f"X = housing.data[:, [0, 2, 4]]:{X}")
