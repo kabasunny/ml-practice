@@ -11,7 +11,7 @@ trade_start_date = pd.Timestamp("2023-01-05")
 
 # ロスカットとトレーリングストップの設定値
 stop_loss_percentage = 3.0  # ロスカット閾値（%）
-trailing_stop_trigger = 10.0  # トレーリングストップが更新されるための上昇閾値（%）
+trailing_stop_trigger = 5.0  # トレーリングストップが更新されるための上昇閾値（%）
 trailing_stop_update = 2.0  # トレーリングストップの更新値（%）
 
 data = fetch_stock_data(symbol, start_date, end_date)
