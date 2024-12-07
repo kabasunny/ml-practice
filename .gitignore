@@ -1,4 +1,4 @@
 # chart_ で始まるすべてのディレクトリを無視する
 chart_*/
 
-__pycache__
+__pycache__/
