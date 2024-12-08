@@ -5,9 +5,9 @@ from plot_results import plot_results
 
 # 使用例
 symbol = "7203.T"  # トヨタ自動車のティッカーシンボル
-start_date = "2023-01-01"
+start_date = "2022-01-01"
 end_date = "2023-12-31"
-trade_start_date = pd.Timestamp("2023-01-05")
+trade_start_date = pd.Timestamp(start_date) # 買いを入れる日
 
 # ロスカットとトレーリングストップの設定値
 stop_loss_percentage = 3.0  # ロスカット閾値（%）
