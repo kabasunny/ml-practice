@@ -10,7 +10,7 @@ if project_root not in sys.path:
     sys.path.append(project_root)
 
 import pandas as pd
-from fetch_stock_data import fetch_stock_data
+from data_processing.fetch_stock_data import fetch_stock_data
 from trading_strategy import trading_strategy
 from setting_stop.plot_stop_results import plot_stop_results
 

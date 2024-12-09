@@ -1,5 +1,7 @@
-from fetch_stock_data import fetch_stock_data
-from detrend_prices import detrend_prices
+# main.py
+
+from data_processing.fetch_stock_data import fetch_stock_data
+from data_processing.detrend_prices import detrend_prices
 from cycle_theory.peak_trough.detect_cycles import detect_cycles
 from cycle_theory.fourier.fft_analysis import fft_analysis
 
@@ -33,10 +35,10 @@ def main():
         mean_absolute_error_trough,
     ) = detect_cycles(detrended_prices)
     print(
-        f"ピークサイクル(日足): [avg:{avg_peak_cycle} , med: {median_peak_cycle} , mae: {mean_absolute_error_peak}%"
+        f"ピークサイクル(日足): [avg: {avg_peak_cycle} , med: {median_peak_cycle} , mae: {mean_absolute_error_peak}%]"
     )
     print(
-        f"谷サイクル(日足): [avg:{avg_trough_cycle} , med: {median_trough_cycle} , mae: {mean_absolute_error_trough}%"
+        f"谷サイクル(日足): [avg: {avg_trough_cycle} , med: {median_trough_cycle} , mae: {mean_absolute_error_trough}%]"
     )
 
     # ----------------    週足    ----------------
@@ -61,10 +63,10 @@ def main():
         mean_absolute_error_trough,
     ) = detect_cycles(weekly_data)
     print(
-        f"ピークサイクル(週足): [avg:{avg_peak_cycle} , med: {median_peak_cycle} , mae: {mean_absolute_error_peak}%"
+        f"ピークサイクル(週足): [avg: {avg_peak_cycle} , med: {median_peak_cycle} , mae: {mean_absolute_error_peak}%]"
     )
     print(
-        f"谷サイクル(週足): [avg:{avg_trough_cycle} , med: {median_trough_cycle} , mae: {mean_absolute_error_trough}%"
+        f"谷サイクル(週足): [avg: {avg_trough_cycle} , med: {median_trough_cycle} , mae: {mean_absolute_error_trough}%]"
     )
 
     # ----------------    月足    ----------------
@@ -90,10 +92,10 @@ def main():
         mean_absolute_error_trough,
     ) = detect_cycles(monthly_data)
     print(
-        f"ピークサイクル(月足): [avg:{avg_peak_cycle} , med: {median_peak_cycle} , mae: {mean_absolute_error_peak}%"
+        f"ピークサイクル(月足): [avg: {avg_peak_cycle} , med: {median_peak_cycle} , mae: {mean_absolute_error_peak}%]"
     )
     print(
-        f"谷サイクル(月足): [avg:{avg_trough_cycle} , med: {median_trough_cycle} , mae: {mean_absolute_error_trough}%"
+        f"谷サイクル(月足): [avg: {avg_trough_cycle} , med: {median_trough_cycle} , mae: {mean_absolute_error_trough}%]"
     )
 
 

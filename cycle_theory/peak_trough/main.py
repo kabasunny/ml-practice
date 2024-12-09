@@ -10,8 +10,8 @@ if project_root not in sys.path:
     sys.path.append(project_root)
 
 # Now import modules from the project root
-from fetch_stock_data import fetch_stock_data
-from detrend_prices import detrend_prices
+from data_processing.fetch_stock_data import fetch_stock_data
+from data_processing.detrend_prices import detrend_prices
 from detect_cycles import detect_cycles
 from plot_cycles import plot_cycles
 
