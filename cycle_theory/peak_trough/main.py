@@ -1,7 +1,20 @@
+# cycle_theory\peak_trough\main.py
+
+import sys
+import os
+
+# Add the project root directory to sys.path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(current_dir, "..", ".."))
+if project_root not in sys.path:
+    sys.path.append(project_root)
+
+# Now import modules from the project root
 from fetch_stock_data import fetch_stock_data
 from detrend_prices import detrend_prices
 from detect_cycles import detect_cycles
 from plot_cycles import plot_cycles
+
 
 # メイン処理
 def main():
@@ -16,34 +29,84 @@ def main():
     detrended_prices = detrend_prices(data)
 
     # サイクルの検出（日足）
-    peaks, troughs, avg_peak_cycle, median_peak_cycle, mean_absolute_error_peak, avg_trough_cycle, median_trough_cycle, mean_absolute_error_trough = detect_cycles(detrended_prices)
-    print(f"平均ピークサイクル: {avg_peak_cycle} 日, 中央値: {median_peak_cycle} 日, 平均誤差: {mean_absolute_error_peak}%")
-    print(f"平均谷サイクル: {avg_trough_cycle} 日, 中央値: {median_trough_cycle} 日, 平均誤差: {mean_absolute_error_trough}%")
+    (
+        peaks,
+        troughs,
+        avg_peak_cycle,
+        median_peak_cycle,
+        mean_absolute_error_peak,
+        avg_trough_cycle,
+        median_trough_cycle,
+        mean_absolute_error_trough,
+    ) = detect_cycles(detrended_prices)
+    print(
+        f"平均ピークサイクル: {avg_peak_cycle} 日, 中央値: {median_peak_cycle} 日, 平均誤差: {mean_absolute_error_peak}%"
+    )
+    print(
+        f"平均谷サイクル: {avg_trough_cycle} 日, 中央値: {median_trough_cycle} 日, 平均誤差: {mean_absolute_error_trough}%"
+    )
 
-    # チャートの描画（日足）
-    plot_cycles(detrended_prices, peaks, troughs, f"Daily Cycle Analysis for {symbol}")  # pandas を必要とする
+    # # チャートの描画（日足）
+    # plot_cycles(
+    #     detrended_prices, peaks, troughs, f"Daily Cycle Analysis for {symbol}"
+    # )  # pandas を必要とする
 
     # データのリサンプリング関数（週足）
-    weekly_data = detrended_prices.resample("W").ffill()  # 週足にリサンプリングし、前週の値を埋める（pandas を必要とする）
+    weekly_data = detrended_prices.resample(
+        "W"
+    ).ffill()  # 週足にリサンプリングし、前週の値を埋める（pandas を必要とする）
 
     # サイクルの検出（週足）
-    peaks, troughs, avg_peak_cycle, median_peak_cycle, mean_absolute_error_peak, avg_trough_cycle, median_trough_cycle, mean_absolute_error_trough = detect_cycles(weekly_data)
-    print(f"平均ピークサイクル: {avg_peak_cycle} 週, 中央値: {median_peak_cycle} 週, 平均誤差: {mean_absolute_error_peak}%")
-    print(f"平均谷サイクル: {avg_trough_cycle} 週, 中央値: {median_trough_cycle} 週, 平均誤差: {mean_absolute_error_trough}%")
+    (
+        peaks,
+        troughs,
+        avg_peak_cycle,
+        median_peak_cycle,
+        mean_absolute_error_peak,
+        avg_trough_cycle,
+        median_trough_cycle,
+        mean_absolute_error_trough,
+    ) = detect_cycles(weekly_data)
+    print(
+        f"平均ピークサイクル: {avg_peak_cycle} 週, 中央値: {median_peak_cycle} 週, 平均誤差: {mean_absolute_error_peak}%"
+    )
+    print(
+        f"平均谷サイクル: {avg_trough_cycle} 週, 中央値: {median_trough_cycle} 週, 平均誤差: {mean_absolute_error_trough}%"
+    )
 
-    # チャートの描画（週足）
-    plot_cycles(weekly_data, peaks, troughs, f"Weekly Cycle Analysis for {symbol}")  # pandas を必要とする
+    # # チャートの描画（週足）
+    # plot_cycles(
+    #     weekly_data, peaks, troughs, f"Weekly Cycle Analysis for {symbol}"
+    # )  # pandas を必要とする
 
     # データのリサンプリング関数（月足）
-    monthly_data = detrended_prices.resample("ME").ffill()  # 月足にリサンプリングし、前月の値を埋める（pandas を必要とする）
+    monthly_data = detrended_prices.resample(
+        "ME"
+    ).ffill()  # 月足にリサンプリングし、前月の値を埋める（pandas を必要とする）
 
     # サイクルの検出（月足）
-    peaks, troughs, avg_peak_cycle, median_peak_cycle, mean_absolute_error_peak, avg_trough_cycle, median_trough_cycle, mean_absolute_error_trough = detect_cycles(monthly_data)
-    print(f"平均ピークサイクル: {avg_peak_cycle} ヶ月, 中央値: {median_peak_cycle} ヶ月, 平均誤差: {mean_absolute_error_peak}%")
-    print(f"平均谷サイクル: {avg_trough_cycle} ヶ月, 中央値: {median_trough_cycle} ヶ月, 平均誤差: {mean_absolute_error_trough}%")
+    (
+        peaks,
+        troughs,
+        avg_peak_cycle,
+        median_peak_cycle,
+        mean_absolute_error_peak,
+        avg_trough_cycle,
+        median_trough_cycle,
+        mean_absolute_eough,
+    ) = detect_cycles(monthly_data)
+    print(
+        f"平均ピークサイクル: {avg_peak_cycle} ヶ月, 中央値: {median_peak_cycle} ヶ月, 平均誤差: {mean_absolute_error_peak}%"
+    )
+    print(
+        f"平均谷サイクル: {avg_trough_cycle} ヶ月, 中央値: {median_trough_cycle} ヶ月, 平均誤差: {mean_absolute_eough}%"
+    )
 
-    # チャートの描画（月足）
-    plot_cycles(monthly_data, peaks, troughs, f"Monthly Cycle Analysis for {symbol}")  # pandas を必要とする
+    # # チャートの描画（月足）
+    # plot_cycles(
+    #     monthly_data, peaks, troughs, f"Monthly Cycle Analysis for {symbol}"
+    # )  # pandas を必要とする
+
 
 if __name__ == "__main__":
     main()
