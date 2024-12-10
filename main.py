@@ -6,9 +6,21 @@ from cycle_theory.peak_trough.detect_cycles import detect_cycles
 from cycle_theory.fourier.fft_analysis import fft_analysis
 
 
+# トヨタ自動車 ( 7203
+# ソニー ( 6758
+# 任天堂 ( 7974
+# 日産自動車 ( 7201
+# ホンダ ( 7267
+# 三菱UFJフィナンシャル・グループ ( 8306
+# キヤノン ( 7751
+# パナソニック ( 6752
+# ソフトバンクグループ ( 9984
+# 東京エレクトロン ( 8035
+
+
 # メイン処理
 def main():
-    symbol = "7203.T"
+    symbol = "9984.T"
     start_date = "2004-01-01"
     end_date = "2023-12-31"
 
@@ -100,36 +112,42 @@ def main():
     # ----------------    週足    ----------------
 
     # データのリサンプリング関数（週足）
-    detrended_prices = detrended_prices.resample(
-        "W"
-    ).ffill()  # 週足にリサンプリングし、前週の値を埋める（pandas を必要とする）
+    detrended_weekly_prices = detrended_prices.resample("W").ffill()
+    detrended_first_half_weekly = detrended_first_half.resample("W").ffill()
+    detrended_second_half_weekly = detrended_second_half.resample("W").ffill()
+    detrended_first_quarter_weekly = detrended_first_quarter.resample("W").ffill()
+    detrended_second_quarter_weekly = detrended_second_quarter.resample("W").ffill()
+    detrended_third_quarter_weekly = detrended_third_quarter.resample("W").ffill()
+    detrended_fourth_quarter_weekly = detrended_fourth_quarter.resample("W").ffill()
 
     print("----------------    週足    ----------------")
     # FFTによるサイクル解析
-    fft_period, fft_amplitude, dominant_periods = fft_analysis(detrended_prices.values)
+    fft_period, fft_amplitude, dominant_periods = fft_analysis(
+        detrended_weekly_prices.values
+    )
     print("fft_analiysis (1/1) :", dominant_periods)
     fft_period, fft_amplitude, dominant_periods = fft_analysis(
-        detrended_first_half.values
+        detrended_first_half_weekly.values
     )
     print("fft_analiysis (1/2) :", dominant_periods)
     fft_period, fft_amplitude, dominant_periods = fft_analysis(
-        detrended_second_half.values
+        detrended_second_half_weekly.values
     )
     print("fft_analiysis (2/2) :", dominant_periods)
     fft_period, fft_amplitude, dominant_periods = fft_analysis(
-        detrended_first_quarter.values
+        detrended_first_quarter_weekly.values
     )
     print("fft_analiysis (1/4) :", dominant_periods)
     fft_period, fft_amplitude, dominant_periods = fft_analysis(
-        detrended_second_quarter.values
+        detrended_second_quarter_weekly.values
     )
     print("fft_analiysis (2/4) :", dominant_periods)
     fft_period, fft_amplitude, dominant_periods = fft_analysis(
-        detrended_third_quarter.values
+        detrended_third_quarter_weekly.values
     )
     print("fft_analiysis (3/4) :", dominant_periods)
     fft_period, fft_amplitude, dominant_periods = fft_analysis(
-        detrended_fourth_quarter.values
+        detrended_fourth_quarter_weekly.values
     )
     print("fft_analiysis (4/4) :", dominant_periods)
 
@@ -145,7 +163,7 @@ def main():
         median_trough_cycle,
         mean_absolute_error_trough,
         mode_trough_cycle,
-    ) = detect_cycles(detrended_prices)
+    ) = detect_cycles(detrended_weekly_prices)
     print(
         f"peak_cycles     : [avg: {avg_peak_cycle} , med: {median_peak_cycle} , mode: {mode_peak_cycle} , mae: {mean_absolute_error_peak} %]"
     )
@@ -156,36 +174,42 @@ def main():
     # ----------------    月足    ----------------
 
     # データのリサンプリング関数（月足）
-    detrended_prices = detrended_prices.resample(
-        "ME"
-    ).ffill()  # 月足にリサンプリングし、前月の値を埋める（pandas を必要とする）
+    detrended_monthly_prices = detrended_prices.resample("ME").ffill()
+    detrended_first_half_monthly = detrended_first_half.resample("ME").ffill()
+    detrended_second_half_monthly = detrended_second_half.resample("ME").ffill()
+    detrended_first_quarter_monthly = detrended_first_quarter.resample("ME").ffill()
+    detrended_second_quarter_monthly = detrended_second_quarter.resample("ME").ffill()
+    detrended_third_quarter_monthly = detrended_third_quarter.resample("ME").ffill()
+    detrended_fourth_quarter_monthly = detrended_fourth_quarter.resample("ME").ffill()
 
     print("----------------    月足    ----------------")
     # FFTによるサイクル解析
-    fft_period, fft_amplitude, dominant_periods = fft_analysis(detrended_prices.values)
+    fft_period, fft_amplitude, dominant_periods = fft_analysis(
+        detrended_monthly_prices.values
+    )
     print("fft_analiysis (1/1) :", dominant_periods)
     fft_period, fft_amplitude, dominant_periods = fft_analysis(
-        detrended_first_half.values
+        detrended_first_half_monthly.values
     )
     print("fft_analiysis (1/2) :", dominant_periods)
     fft_period, fft_amplitude, dominant_periods = fft_analysis(
-        detrended_second_half.values
+        detrended_second_half_monthly.values
     )
     print("fft_analiysis (2/2) :", dominant_periods)
     fft_period, fft_amplitude, dominant_periods = fft_analysis(
-        detrended_first_quarter.values
+        detrended_first_quarter_monthly.values
     )
     print("fft_analiysis (1/4) :", dominant_periods)
     fft_period, fft_amplitude, dominant_periods = fft_analysis(
-        detrended_second_quarter.values
+        detrended_second_quarter_monthly.values
     )
     print("fft_analiysis (2/4) :", dominant_periods)
     fft_period, fft_amplitude, dominant_periods = fft_analysis(
-        detrended_third_quarter.values
+        detrended_third_quarter_monthly.values
     )
     print("fft_analiysis (3/4) :", dominant_periods)
     fft_period, fft_amplitude, dominant_periods = fft_analysis(
-        detrended_fourth_quarter.values
+        detrended_fourth_quarter_monthly.values
     )
     print("fft_analiysis (4/4) :", dominant_periods)
 
@@ -201,7 +225,7 @@ def main():
         median_trough_cycle,
         mean_absolute_error_trough,
         mode_trough_cycle,
-    ) = detect_cycles(detrended_prices)
+    ) = detect_cycles(detrended_monthly_prices)
     print(
         f"peak_cycles     : [avg: {avg_peak_cycle} , med: {median_peak_cycle} , mode: {mode_peak_cycle} , mae: {mean_absolute_error_peak} %]"
     )
