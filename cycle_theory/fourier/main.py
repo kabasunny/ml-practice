@@ -29,12 +29,15 @@ def main():
     # 前処理（線形トレンド除去）
     detrended_prices = detrend_prices(data)
 
+    print(f"symbol: {symbol} , start_date: {start_date} , end_date: {end_date}")
+
     # FFTによるサイクル解析（日足）
     fft_period, fft_amplitude, dominant_periods = fft_analysis(detrended_prices.values)
-    print("上位5つの周期 (日足):", dominant_periods)
+    print("日足")
+    print("fft_analiysis :", dominant_periods)
 
     # FFTスペクトルのプロット（日足）
-    # plot_fft(fft_period, fft_amplitude, "FFT Analysis (Log Scale) - Daily")
+    plot_fft(fft_period, fft_amplitude, "FFT Analysis (Log Scale) - Daily")
 
     # データのリサンプリング（週足）
     weekly_data = detrended_prices.resample(
@@ -43,10 +46,11 @@ def main():
 
     # FFTによるサイクル解析（週足）
     fft_period, fft_amplitude, dominant_periods = fft_analysis(weekly_data.values)
-    print("上位5つの周期 (週足):", dominant_periods)
+    print("週足")
+    print("fft_analiysis :", dominant_periods)
 
     # FFTスペクトルのプロット（週足）
-    # plot_fft(fft_period, fft_amplitude, "FFT Analysis (Log Scale) - Weekly")
+    plot_fft(fft_period, fft_amplitude, "FFT Analysis (Log Scale) - Weekly")
 
     # データのリサンプリング（月足）
     monthly_data = detrended_prices.resample(
@@ -55,10 +59,11 @@ def main():
 
     # FFTによるサイクル解析（月足）
     fft_period, fft_amplitude, dominant_periods = fft_analysis(monthly_data.values)
-    print("上位5つの周期 (月足):", dominant_periods)
+    print("月足")
+    print("fft_analiysis :", dominant_periods)
 
     # FFTスペクトルのプロット（月足）
-    # plot_fft(fft_period, fft_amplitude, "FFT Analysis (Log Scale) - Monthly")
+    plot_fft(fft_period, fft_amplitude, "FFT Analysis (Log Scale) - Monthly")
 
 
 if __name__ == "__main__":

@@ -1,3 +1,4 @@
+# cycle_theory\fourier\fft_analysis.py
 import numpy as np
 
 
@@ -21,17 +22,17 @@ def fft_analysis(prices):
     fft_period = np.round(fft_period, 1)  # 周期を少数第一位までに丸める
     fft_amplitude = np.round(fft_amplitude, 1)  # 振幅スペクトルを少数第一位までに丸める
 
-    # 最大値を除外
-    if len(fft_amplitude) > 1:
-        max_idx = np.argmax(fft_amplitude)  # 最大値のインデックスを取得
-        excluded_value = fft_period[max_idx]  # 除外する最大周期の値を取得
-        fft_amplitude = np.delete(
-            fft_amplitude, max_idx
-        )  # 最大値を振幅スペクトルから除去
-        fft_period = np.delete(
-            fft_period, max_idx
-        )  # 信頼性が低いと考え、最大周期を周期リストから除去
-        print(f"除外した最大周期の値: {excluded_value}")  # 除外した値をアナウンス
+    # # 最大値を除外
+    # if len(fft_amplitude) > 1:
+    #     max_idx = np.argmax(fft_amplitude)  # 最大値のインデックスを取得
+    #     excluded_value = fft_period[max_idx]  # 除外する最大周期の値を取得
+    #     fft_amplitude = np.delete(
+    #         fft_amplitude, max_idx
+    #     )  # 最大値を振幅スペクトルから除去
+    #     fft_period = np.delete(
+    #         fft_period, max_idx
+    #     )  # 信頼性が低いと考え、最大周期を周期リストから除去
+    #     print(f"excluded_fft_period : {excluded_value}")  # 除外した値をアナウンス
 
     dominant_periods = fft_period[
         np.argsort(-fft_amplitude)[:10]
