@@ -28,6 +28,10 @@ trailing_stop_update = 2.0  # トレーリングストップの更新値（%）
 
 data = fetch_stock_data(symbol, start_date, end_date)
 
+print(
+    f"銘柄コード: {symbol} , チャートstart_date: {start_date} , チャートend_date: {end_date}"
+)
+
 purchase_date, purchase_price, end_date, end_price, profit_loss, trade_result = (
     trading_strategy(
         data,
@@ -38,12 +42,12 @@ purchase_date, purchase_price, end_date, end_price, profit_loss, trade_result = 
     )
 )
 
-print(f"開始日: {purchase_date}")
-print(f"購入金額: {purchase_price}")
-print(f"終了日: {end_date}")
-print(f"終了金額: {end_price}")
-print(f"損益%: {profit_loss:.2f}%")
-print(f"結果: {'1 : 勝ち' if trade_result == 1 else '0 : 負け'}")
+print(
+    f"LC初期値: {stop_loss_percentage}%, LC引上げ閾値: {trailing_stop_trigger}%,  TS時LC更新値: {trailing_stop_update}%"
+)
+print(f"開始日: {purchase_date}, 購入金額: {purchase_price}")
+print(f"終了日: {end_date}, 終了金額: {end_price}")
+print(f"損益%: {profit_loss:.2f}%, 結果: {'1 : 勝' if trade_result == 1 else '0 : 負'}")
 
 # 結果のプロット
 data["Date"] = data.index  # Date列を追加
