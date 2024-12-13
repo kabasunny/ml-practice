@@ -2,3 +2,7 @@
 chart_*/
 
 __pycache__/
+
+best_params.csv
+
+optimization_results.csv

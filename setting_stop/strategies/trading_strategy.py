@@ -33,9 +33,9 @@ def trading_strategy(
         low_price = data.loc[current_date, "Low"]
         close_price = data.loc[current_date, "Close"]
 
-        print(
-            f"日付: {current_date}, 始値: {open_price}, 安値: {low_price}, 終値: {close_price}"
-        )
+        # print(
+        #     f"日付: {current_date}, 始値: {open_price}, 安値: {low_price}, 終値: {close_price}"
+        # )
 
         # ロスカット条件: 当日の始値がロスカット値以下
         if open_price <= stop_loss_threshold:
@@ -60,7 +60,7 @@ def trading_strategy(
                 close_price * (1 + trailing_stop_trigger / 100), 1
             )
             print(
-                f"TS更新: 日付 {current_date}, ST値(新LC値) {stop_loss_threshold}, 次TS発動値 {trailing_stop_trigger_price}"
+                f"SL更新: 日付 {current_date}, SL値(新LC値) {stop_loss_threshold}, 次TS発動値 {trailing_stop_trigger_price}"
             )
 
     # 取引終了条件が満たされなかった場合
