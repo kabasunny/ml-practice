@@ -23,31 +23,31 @@ trade_start_date = pd.Timestamp("2022-03-08")  # 買いを入れる日
 
 # ロスカットとトレーリングストップの設定値
 stop_loss_percentage = 3.0  # ロスカット閾値（%）
-trailing_stop_trigger = 5.0  # トレーリングストップが更新されるための上昇閾値（%）
-trailing_stop_update = 2.0  # トレーリングストップの更新値（%）
+trailing_stop_trigger = 10.0  # トレーリングストップが更新されるための上昇閾値（%）
+trailing_stop_update = 5.0  # トレーリングストップの更新値（%）
 
 data = fetch_stock_data(symbol, start_date, end_date)
 
 print(
-    f"銘柄コード: {symbol} , チャートstart_date: {start_date} , チャートend_date: {end_date}"
+    f"銘柄コード: {symbol} , チャートstart_date: {start_date} to end_date: {end_date}"
 )
-
-purchase_date, purchase_price, end_date, end_price, profit_loss, trade_result = (
-    trading_strategy(
-        data,
-        trade_start_date,
-        stop_loss_percentage,
-        trailing_stop_trigger,
-        trailing_stop_update,
-    )
-)
-
 print(
-    f"LC初期値: {stop_loss_percentage}%, LC引上げ閾値: {trailing_stop_trigger}%,  TS時LC更新値: {trailing_stop_update}%"
+    f"LC初期値: {stop_loss_percentage}%, LC引上げ閾値: {trailing_stop_trigger}%, TS時LC更新値: {trailing_stop_update}%"
 )
+
+purchase_date, purchase_price, end_date, end_price, profit_loss = trading_strategy(
+    data,
+    trade_start_date,
+    stop_loss_percentage,
+    trailing_stop_trigger,
+    trailing_stop_update,
+)
+
 print(f"開始日: {purchase_date}, 購入金額: {purchase_price}")
 print(f"終了日: {end_date}, 終了金額: {end_price}")
-print(f"損益%: {profit_loss:.2f}%, 結果: {'1 : 勝' if trade_result == 1 else '0 : 負'}")
+result = "勝" if profit_loss >= 10 else "いずれでもない" if profit_loss > -10 else "負"
+print(f"損益%: {profit_loss:.2f}%, 結果: {result}")
+# print(f"損益%: {profit_loss:.2f}%, 結果: {'1 : 勝' if trade_result == 1 else '0 : 負'}")
 
 # 結果のプロット
 data["Date"] = data.index  # Date列を追加
