@@ -18,10 +18,10 @@ def trading_strategy(
         purchase_price * (1 + trailing_stop_trigger / 100), 1
     )  # 初期トレーリングストップ値
 
-    print(f"取引開始日: {purchase_date}, 始値: {purchase_price}")
-    print(
-        f"初期LC値: {round(stop_loss_threshold, 1)}, 初期TS発動値: {round(trailing_stop_trigger_price, 1)}"
-    )
+    # print(f"取引開始日: {purchase_date}, 始値: {purchase_price}")
+    # print(
+    #     f"初期LC値: {round(stop_loss_threshold, 1)}, 初期TS発動値: {round(trailing_stop_trigger_price, 1)}"
+    # )
 
     # 初期化
     end_date = None
@@ -41,14 +41,14 @@ def trading_strategy(
         if open_price <= stop_loss_threshold:
             end_price = open_price
             end_date = current_date
-            print(f"LC発動: 日付 {end_date}, 終了価格 {end_price}")
+            # print(f"LC発動: 日付 {end_date}, 終了価格 {end_price}")
             break
 
         # トレーリングストップ発動条件: 当日の安値がトレーリングストップ値以下
         if low_price <= stop_loss_threshold:
             end_price = low_price
             end_date = current_date
-            print(f"TS発動: 日付 {end_date}, 終了価格 {end_price}")
+            # print(f"TS発動: 日付 {end_date}, 終了価格 {end_price}")
             break
 
         # トレーリングストップ更新条件: 終値がトリガーを超えた場合
@@ -59,9 +59,9 @@ def trading_strategy(
             trailing_stop_trigger_price = round(
                 close_price * (1 + trailing_stop_trigger / 100), 1
             )
-            print(
-                f"SL更新: 日付 {current_date}, SL値(新LC値) {stop_loss_threshold}, 次TS発動値 {trailing_stop_trigger_price}"
-            )
+            # print(
+            #     f"SL更新: 日付 {current_date}, SL値(新LC値) {stop_loss_threshold}, 次TS発動値 {trailing_stop_trigger_price}"
+            # )
 
     # 取引終了条件が満たされなかった場合
     if end_date is None:
