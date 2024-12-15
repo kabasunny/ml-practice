@@ -85,7 +85,7 @@ def main():
         mean_absolute_error_trough,
         mode_trough_cycle,
     ) = detect_cycles(detrended_prices)
-    print(f"troughs: {troughs}")
+    # print(f"troughs: {troughs}")
     print(
         f"trough_cycles: [avg: {avg_trough_cycle} , med: {median_trough_cycle} , mode: {mode_trough_cycle} , mae: {mean_absolute_error_trough} %]"
     )
@@ -133,17 +133,17 @@ def main():
         mean_absolute_error_trough,
         mode_trough_cycle,
     ) = detect_cycles(detrended_weekly_prices)
-    print(f"troughs: {troughs}")
+    # print(f"troughs: {troughs}")
     print(
         f"trough_cycles: [avg: {avg_trough_cycle} , med: {median_trough_cycle} , mode: {mode_trough_cycle} , mae: {mean_absolute_error_trough} %]"
     )
 
     
-    # トラフのインデックスに対応する日付を取得
-    trough_dates = weekly_data.iloc[troughs].index
+    # # トラフのインデックスに対応する日付を取得
+    # trough_dates = weekly_data.iloc[troughs].index
     
-    # トラフの日付のラベルを1に設定
-    weekly_data.loc[trough_dates, 'Label'] = 1
+    # # トラフの日付のラベルを1に設定
+    # weekly_data.loc[trough_dates, 'Label'] = 1
 
 
 
@@ -184,7 +184,7 @@ def main():
         mean_absolute_error_trough,
         mode_trough_cycle,
     ) = detect_cycles(detrended_monthly_prices)
-    print(f"troughs: {troughs}")
+    # print(f"troughs: {troughs}")
     print(
         f"trough_cycles: [avg: {avg_trough_cycle} , med: {median_trough_cycle} , mode: {mode_trough_cycle} , mae: {mean_absolute_error_trough} %]"
     )

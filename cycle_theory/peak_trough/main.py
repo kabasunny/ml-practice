@@ -17,11 +17,13 @@ import pandas as pd
 
 def main():
     symbol = "7203.T"
-    start_date = "2023-01-01"
+    start_date = "2020-01-01"
     end_date = "2023-12-31"
 
     # データの取得（日足）
-    daily_data, weekly_data, monthly_data = fetch_stock_data(symbol, start_date, end_date)
+    daily_data = fetch_stock_data(symbol, start_date, end_date)
+    weekly_data = daily_data.resample("W").ffill()
+    monthly_data = daily_data.resample("ME").ffill()
     
     # 前処理（線形トレンド除去）
     detrended_daily_data = detrend_prices(daily_data['Close'], remove_trend=True)

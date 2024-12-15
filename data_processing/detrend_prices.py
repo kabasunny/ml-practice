@@ -6,6 +6,7 @@ import pandas as pd
 def detrend_prices(prices, remove_trend=True):
     if remove_trend:
         n = len(prices)
+        prices = prices['Close']  # とりあえず'Close' 列を使用
 
         # 線形トレンドの計算
         slope = (prices.iloc[-1] - prices.iloc[0]) / n

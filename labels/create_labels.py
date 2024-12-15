@@ -9,7 +9,7 @@ if project_root not in sys.path:
 
 import numpy as np
 import pandas as pd
-from detect_troughs import detect_troughs
+from labels.detect_troughs import detect_troughs
 from data_processing.fetch_stock_data import fetch_stock_data
 import matplotlib.pyplot as plt
 

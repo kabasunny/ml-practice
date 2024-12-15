@@ -1,5 +1,3 @@
-# setting_stop/optimize_parameters.py
-
 import pandas as pd
 from itertools import product
 from tqdm import tqdm
