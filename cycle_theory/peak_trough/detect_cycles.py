@@ -5,12 +5,12 @@ from scipy.stats import mode
 
 
 # サイクル検出関数
-def detect_cycles(close_prices):
+def detect_cycles(prices):
     # 終値のデータからピーク（高値）を検出
-    peaks, _ = find_peaks(close_prices)
+    peaks, _ = find_peaks(prices)
 
     # 終値のデータから谷（安値）を検出
-    troughs, _ = find_peaks(-close_prices)
+    troughs, _ = find_peaks(-prices)
 
     # ピーク間の間隔を計算
     peak_intervals = np.diff(peaks)

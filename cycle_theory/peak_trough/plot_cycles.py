@@ -1,13 +1,18 @@
 import matplotlib.pyplot as plt
 
-# グラフ描画関数
 def plot_cycles(data, peaks, troughs, title):
-    plt.figure(figsize=(12, 6))
-    plt.plot(data.index, data, label="Close Price", color="blue")
-    plt.scatter(data.index[peaks], data.iloc[peaks], color="red", label="Peaks")
-    plt.scatter(data.index[troughs], data.iloc[troughs], color="green", label="Troughs")
+    plt.figure(figsize=(14, 7))
+    # 'Low'列の代わりに実際の列名を使用
+    plt.plot(data.index, data, label='Detrended Prices')
+    
+    # PeaksとTroughsをプロットする前にサイズをチェック
+    if len(peaks) > 0:
+        plt.scatter(data.index[peaks], data.iloc[peaks], color='red', label='Peaks')
+    if len(troughs) > 0:
+        plt.scatter(data.index[troughs], data.iloc[troughs], color='blue', label='Troughs')
+    
     plt.title(title)
-    plt.xlabel("Date")
-    plt.ylabel("Price")
+    plt.xlabel('Date')
+    plt.ylabel('Detrended Prices')
     plt.legend()
     plt.show()
