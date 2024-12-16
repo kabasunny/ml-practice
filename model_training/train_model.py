@@ -1,50 +1,55 @@
-# model_training/train_model.py
-
-import lightgbm as lgb
+from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import train_test_split
+import lightgbm as lgb
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from lightgbm import early_stopping, log_evaluation
 
 def train_and_evaluate_model(features_df):
-    # 説明変数と目的変数の分離
-    X = features_df.drop('Label', axis=1)
-    y = features_df['Label']
+    # 説明変数（特徴量）と目的変数（ラベル）の分離
+    X = features_df.drop('Label', axis=1)  # 説明変数
+    y = features_df['Label']  # 目的変数
 
-    # 学習データとテストデータの分割
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
+    # SMOTEによるオーバーサンプリング
+    smote = SMOTE(sampling_strategy='auto', random_state=42)
+    X_res, y_res = smote.fit_resample(X, y)
 
-    # データセットの作成
+    # データセットを訓練データとテストデータに分割（80%を訓練データ、20%をテストデータ）
+    X_train, X_test, y_train, y_test = train_test_split(X_res, y_res, test_size=0.2, shuffle=True, random_state=42)
+
+    # LightGBMのデータセットを作成
     lgb_train = lgb.Dataset(X_train, y_train)
     lgb_eval = lgb.Dataset(X_test, y_test, reference=lgb_train)
 
-    # ハイパーパラメータの設定
+    # LightGBMのハイパーパラメータを設定
     params = {
-        'objective': 'binary',
-        'metric': 'binary_logloss',
-        'boosting_type': 'gbdt',
-        'learning_rate': 0.05,
-        'num_leaves': 31,
-        'verbose': -1
+        'objective': 'binary',  # バイナリ分類問題を指定
+        'metric': 'binary_logloss',  # 損失関数としてバイナリログ損失を使用
+        'boosting_type': 'gbdt',  # 勾配ブースティング決定木を使用
+        'learning_rate': 0.05,  # 学習率を設定
+        'num_leaves': 31,  # リーフノードの数を設定
+        'verbose': -1  # 詳細出力を抑制
     }
 
-    # モデルの学習
+    # モデルを訓練
     gbm = lgb.train(
-        params,
-        lgb_train,
-        valid_sets=[lgb_train, lgb_eval],
-        num_boost_round=1000,
-        early_stopping_rounds=100,
-        verbose_eval=100
+        params,  # ハイパーパラメータ
+        lgb_train,  # 訓練データ
+        valid_sets=[lgb_eval],  # 検証データセット
+        num_boost_round=1000,  # ブースティングの総ラウンド数
+        callbacks=[early_stopping(stopping_rounds=100), log_evaluation(100)]  # アーリーストッピングとログ評価の設定
     )
 
-    # モデルの評価
+    # テストデータに対する予測を行い、0と1に変換
     y_pred = gbm.predict(X_test, num_iteration=gbm.best_iteration)
     y_pred_binary = (y_pred > 0.5).astype(int)
 
+    # モデルの評価指標を計算
     accuracy = accuracy_score(y_test, y_pred_binary)
-    precision = precision_score(y_test, y_pred_binary)
-    recall = recall_score(y_test, y_pred_binary)
-    f1 = f1_score(y_test, y_pred_binary)
+    precision = precision_score(y_test, y_pred_binary, zero_division=0)
+    recall = recall_score(y_test, y_pred_binary, zero_division=0)
+    f1 = f1_score(y_test, y_pred_binary, zero_division=0)
 
+    # 評価結果を表示
     print('モデルの評価結果:')
     print(f'Accuracy: {accuracy:.4f}')
     print(f'Precision: {precision:.4f}')
