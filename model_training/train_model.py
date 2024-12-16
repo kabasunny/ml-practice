@@ -3,8 +3,16 @@ from sklearn.model_selection import train_test_split
 import lightgbm as lgb
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from lightgbm import early_stopping, log_evaluation
+import pandas as pd
+from model_training.plot_buy_chart import plot_feature_importance  # 新しいプロット関数をインポート
 
 def train_and_evaluate_model(features_df):
+    
+    # 不正解ラベルのデータ数と正解ラベルのデータ数を表示
+    label_counts = features_df['Label'].value_counts()
+    print(f"不正解ラベル数: {label_counts[0]}")
+    print(f"正解ラベル数  : {label_counts[1]}")
+
     # 説明変数（特徴量）と目的変数（ラベル）の分離
     X = features_df.drop('Label', axis=1)  # 説明変数
     y = features_df['Label']  # 目的変数
@@ -55,5 +63,18 @@ def train_and_evaluate_model(features_df):
     print(f'Precision: {precision:.4f}')
     print(f'Recall: {recall:.4f}')
     print(f'F1 Score: {f1:.4f}')
+
+    # 特徴量重要度の取得と表示
+    feature_importance = gbm.feature_importance()
+    feature_names = X_train.columns
+    importance_df = pd.DataFrame({'Feature': feature_names, 'Importance': feature_importance})
+    importance_df = importance_df.sort_values(by='Importance', ascending=False)
+    
+    # 特徴量重要度をターミナルに表示
+    print("\n特徴量の重要度:")
+    print(importance_df)
+
+    # # 特徴量重要度のプロット
+    # plot_feature_importance(importance_df)
 
     return gbm

@@ -10,108 +10,76 @@ def create_features(daily_data, trade_start_date, labeled_data, data_numbers):
 
     # トレンド除去
     remove_trend = True
-    detrended_prices = detrend_prices(daily_data, remove_trend)
+    detrended_daily_prices = detrend_prices(daily_data, remove_trend)
     detrended_weekly_prices = detrend_prices(weekly_data, remove_trend)
     detrended_monthly_prices = detrend_prices(monthly_data, remove_trend)
 
-    # 特徴量の作成
-    features = []
-    feature_dates = []  # 特徴量作成時の日付を保持するリスト
+    # ラベルデータを取引開始日以降に限定
+    labeled_data = labeled_data[labeled_data.index >= trade_start_date]
 
-    # 正解ラベルの特徴量を全数作成
-    for date in labeled_data[labeled_data['Label'] == 1].index:
-        if date >= trade_start_date:
-            recent_daily_prices = detrended_prices.loc[:date].tail(90)
-            recent_weekly_prices = detrended_weekly_prices.loc[:date].tail(60)
-            recent_monthly_prices = detrended_monthly_prices.loc[:date].tail(36)
-
-            feature = create_individual_features(recent_daily_prices, recent_weekly_prices, recent_monthly_prices)
-            features.append(feature)
-            feature_dates.append(date)  # 日付をリストに追加
-
-    # 正解ラベル数に応じて不正解ラベルの特徴量をランダムに選択して作成
-    num_correct_labels = len(feature_dates)
+    # 正解ラベルと不正解ラベルのデータを取得
+    correct_label_dates = labeled_data[labeled_data['Label'] == 1].index
+    num_correct_labels = len(correct_label_dates)
     num_incorrect_labels = num_correct_labels * data_numbers
-    incorrect_label_dates = labeled_data[(labeled_data['Label'] == 0) & (labeled_data.index >= trade_start_date)].sample(num_incorrect_labels).index
+    incorrect_label_dates = labeled_data[labeled_data['Label'] == 0].sample(num_incorrect_labels).index
 
-    for date in incorrect_label_dates:
-        recent_daily_prices = detrended_prices.loc[:date].tail(90)
-        recent_weekly_prices = detrended_weekly_prices.loc[:date].tail(60)
-        recent_monthly_prices = detrended_monthly_prices.loc[:date].tail(36)
+    # 特徴量の作成
+    features_correct, dates_correct = create_features_for_dates(correct_label_dates, detrended_daily_prices, detrended_weekly_prices, detrended_monthly_prices)
+    features_incorrect, dates_incorrect = create_features_for_dates(incorrect_label_dates, detrended_daily_prices, detrended_weekly_prices, detrended_monthly_prices)
 
-        feature = create_individual_features(recent_daily_prices, recent_weekly_prices, recent_monthly_prices)
-        features.append(feature)
-        feature_dates.append(date)  # 日付をリストに追加
+    # 特徴量と日付を結合
+    features = features_correct + features_incorrect
+    feature_dates = dates_correct + dates_incorrect
 
-    # 特徴量のデータフレーム化
+    # データフレーム化
     features_df = pd.DataFrame(features, index=feature_dates)
 
-    # ラベルを結合
+    # ラベルを追加
     features_df['Label'] = labeled_data['Label'].loc[feature_dates]
 
     return features_df
 
-def create_individual_features(detrended_prices, detrended_weekly_prices, detrended_monthly_prices):
+def create_features_for_dates(dates, daily_prices, weekly_prices, monthly_prices):
+    features = []
+    feature_dates = []
+    for date in dates:
+        recent_prices = {
+            'daily': daily_prices.loc[:date].tail(90),
+            'weekly': weekly_prices.loc[:date].tail(60),
+            'monthly': monthly_prices.loc[:date].tail(36)
+        }
+        feature = create_individual_features(recent_prices)
+        features.append(feature)
+        feature_dates.append(date)
+    return features, feature_dates
+
+def create_individual_features(recent_prices):
     feature = {}
+    for freq, prices in recent_prices.items():
+        prefix = freq
+        feature.update(process_frequency_features(prices, prefix))
+    return feature
 
-    # 日足の特徴量
-    if len(detrended_prices) > 0:
-        _, daily_troughs, _, _, _, _, avg_trough_cycle, median_trough_cycle, _, mode_trough_cycle = detect_cycles(detrended_prices)
-        if len(daily_troughs) > 1:
-            feature['daily_avg_trough_cycle'] = avg_trough_cycle
-            feature['daily_med_trough_cycle'] = median_trough_cycle
-            feature['daily_mode_trough_cycle'] = mode_trough_cycle
+def process_frequency_features(prices, prefix):
+    feature = {}
+    if len(prices) > 0:
+        # サイクル検出
+        _, troughs, _, _, _, _, avg_trough_cycle, median_trough_cycle, _, mode_trough_cycle = detect_cycles(prices)
+        if len(troughs) > 1:
+            feature[f'{prefix}_avg_trough_cycle'] = avg_trough_cycle
+            feature[f'{prefix}_med_trough_cycle'] = median_trough_cycle
+            feature[f'{prefix}_mode_trough_cycle'] = mode_trough_cycle
         else:
-            feature['daily_avg_trough_cycle'] = np.nan
-            feature['daily_med_trough_cycle'] = np.nan
-            feature['daily_mode_trough_cycle'] = np.nan
+            feature[f'{prefix}_avg_trough_cycle'] = np.nan
+            feature[f'{prefix}_med_trough_cycle'] = np.nan
+            feature[f'{prefix}_mode_trough_cycle'] = np.nan
 
-        _, _, dominant_periods = fft_analysis(detrended_prices.values)
-        feature['daily_fft_dominant_period'] = dominant_periods[0] if len(dominant_periods) > 0 else np.nan
+        # FFT解析
+        _, _, dominant_periods = fft_analysis(prices.values)
+        feature[f'{prefix}_fft_dominant_period'] = dominant_periods[0] if len(dominant_periods) > 0 else np.nan
     else:
-        feature['daily_avg_trough_cycle'] = np.nan
-        feature['daily_med_trough_cycle'] = np.nan
-        feature['daily_mode_trough_cycle'] = np.nan
-        feature['daily_fft_dominant_period'] = np.nan
-
-    # 週足の特徴量
-    if len(detrended_weekly_prices) > 0:
-        _, weekly_troughs, _, _, _, _, avg_trough_cycle, median_trough_cycle, _, mode_trough_cycle = detect_cycles(detrended_weekly_prices)
-        if len(weekly_troughs) > 1:
-            feature['weekly_avg_trough_cycle'] = avg_trough_cycle
-            feature['weekly_med_trough_cycle'] = median_trough_cycle
-            feature['weekly_mode_trough_cycle'] = mode_trough_cycle
-        else:
-            feature['weekly_avg_trough_cycle'] = np.nan
-            feature['weekly_med_trough_cycle'] = np.nan
-            feature['weekly_mode_trough_cycle'] = np.nan
-
-        _, _, dominant_periods = fft_analysis(detrended_weekly_prices.values)
-        feature['weekly_fft_dominant_period'] = dominant_periods[0] if len(dominant_periods) > 0 else np.nan
-    else:
-        feature['weekly_avg_trough_cycle'] = np.nan
-        feature['weekly_med_trough_cycle'] = np.nan
-        feature['weekly_mode_trough_cycle'] = np.nan
-        feature['weekly_fft_dominant_period'] = np.nan
-
-    # 月足の特徴量
-    if len(detrended_monthly_prices) > 0:
-        _, monthly_troughs, _, _, _, _, avg_trough_cycle, median_trough_cycle, _, mode_trough_cycle = detect_cycles(detrended_monthly_prices)
-        if len(monthly_troughs) > 1:
-            feature['monthly_avg_trough_cycle'] = avg_trough_cycle
-            feature['monthly_med_trough_cycle'] = median_trough_cycle
-            feature['monthly_mode_trough_cycle'] = mode_trough_cycle
-        else:
-            feature['monthly_avg_trough_cycle'] = np.nan
-            feature['monthly_med_trough_cycle'] = np.nan
-            feature['monthly_mode_trough_cycle'] = np.nan
-
-        _, _, dominant_periods = fft_analysis(detrended_monthly_prices.values)
-        feature['monthly_fft_dominant_period'] = dominant_periods[0] if len(dominant_periods) > 0 else np.nan
-    else:
-        feature['monthly_avg_trough_cycle'] = np.nan
-        feature['monthly_med_trough_cycle'] = np.nan
-        feature['monthly_mode_trough_cycle'] = np.nan
-        feature['monthly_fft_dominant_period'] = np.nan
-
+        feature[f'{prefix}_avg_trough_cycle'] = np.nan
+        feature[f'{prefix}_med_trough_cycle'] = np.nan
+        feature[f'{prefix}_mode_trough_cycle'] = np.nan
+        feature[f'{prefix}_fft_dominant_period'] = np.nan
     return feature
