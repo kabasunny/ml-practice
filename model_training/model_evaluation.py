@@ -39,11 +39,11 @@ def model_predict_and_plot(
     print(f"F1 Score [2 * (Precision * Recall) / (Precision + Recall)]: {f1_score:.4f}")
     print(f"NPV [TN / (TN + FN)]       : {npv:.4f}")
 
-    # # 各シンボルごとのプロット
-    # for symbol in symbol_data_dict.keys():
-    #     daily_data = symbol_data_dict[symbol]
-    #     features_df = all_features_df[all_features_df["Symbol"] == symbol]
-    #     plot_results(daily_data, features_df, results_df, symbol)
+    # 各シンボルごとのプロット
+    for symbol in symbol_data_dict.keys():
+        daily_data = symbol_data_dict[symbol]
+        features_df = all_features_df[all_features_df["Symbol"] == symbol]
+        plot_results(daily_data, features_df, results_df, symbol)
 
 
 def custom_metrics(y_test, y_pred_binary):

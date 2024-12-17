@@ -24,6 +24,7 @@ def main():
     end_date = pd.Timestamp("today")  # 最新の日付に設定
 
     all_features_df = pd.DataFrame()
+    all_features_all_df = pd.DataFrame()
     symbol_data_dict = {}  # 銘柄ごとのデータを格納する辞書
 
     for symbol in symbols:
@@ -45,18 +46,21 @@ def main():
 
             # 特徴量の作成
             data_numbers = 4  # 不正解データが正解ラベルの 4倍
-            features_df = create_features(
+            features_df, features_all_df = create_features(
                 daily_data, trade_start_date, labeled_data, data_numbers
             )
 
             # シンボルカラムを追加
             features_df["Symbol"] = symbol
+            features_all_df["Symbol"] = symbol
 
             # 欠損値の削除
             features_df.dropna(inplace=True)
+            features_all_df.dropna(inplace=True)
 
             # 結合
             all_features_df = pd.concat([all_features_df, features_df])
+            all_features_all_df = pd.concat([all_features_all_df, features_all_df])
 
             # 各シンボルごとのデータを辞書に格納
             symbol_data_dict[symbol] = daily_data
@@ -69,6 +73,7 @@ def main():
 
     # 学習に使用する特徴量データフレームからシンボルカラムを除外
     training_features_df = all_features_df.drop(columns=["Symbol"])
+    model_predict_features_df = all_features_all_df.drop(columns=["Symbol"])
 
     # 処理時間
     end_time = time.time()  # 処理終了時刻を記録
@@ -79,7 +84,9 @@ def main():
     gbm = train_and_evaluate_model(training_features_df)
 
     # モデルの予測と結果の確認
-    model_predict_and_plot(gbm, training_features_df, all_features_df, symbol_data_dict)
+    model_predict_and_plot(
+        gbm, model_predict_features_df, all_features_all_df, symbol_data_dict
+    )
 
 
 if __name__ == "__main__":
