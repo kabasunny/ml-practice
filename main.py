@@ -1,3 +1,4 @@
+# main.py
 from data_processing.fetch_stock_data import fetch_stock_data
 from labels.create_labels import create_labels
 from model_training.train_model import train_and_evaluate_model
@@ -6,6 +7,7 @@ from model_training.model_evaluation import model_predict_and_plot
 from sectors import get_symbols_by_sector  # セクターリストの関数をインポート
 import pandas as pd
 import time
+
 
 def main():
     start_time = time.time()  # 処理開始時刻を記録
@@ -17,9 +19,9 @@ def main():
     # セクター番号に基づいて銘柄リストを取得
     symbols = get_symbols_by_sector(sector_number)
 
-    trade_start_date = pd.Timestamp("2005-08-01") # テスト用データの最初の日
-    before_period_days = 366 * 3 # 月足取得に必要な期間（月足36個にしている約3年分）
-    end_date = pd.Timestamp("today") # 最新の日付に設定
+    trade_start_date = pd.Timestamp("2005-08-01")  # テスト用データの最初の日
+    before_period_days = 366 * 3  # 月足取得に必要な期間（月足36個にしている約3年分）
+    end_date = pd.Timestamp("today")  # 最新の日付に設定
 
     all_features_df = pd.DataFrame()
     symbol_data_dict = {}  # 銘柄ごとのデータを格納する辞書
@@ -42,11 +44,13 @@ def main():
             labeled_data = create_labels(daily_data)
 
             # 特徴量の作成
-            data_numbers = 4 # 不正解データが正解ラベルの 4倍 
-            features_df = create_features(daily_data, trade_start_date, labeled_data, data_numbers)
-            
+            data_numbers = 4  # 不正解データが正解ラベルの 4倍
+            features_df = create_features(
+                daily_data, trade_start_date, labeled_data, data_numbers
+            )
+
             # シンボルカラムを追加
-            features_df['Symbol'] = symbol
+            features_df["Symbol"] = symbol
 
             # 欠損値の削除
             features_df.dropna(inplace=True)
@@ -64,7 +68,7 @@ def main():
             print(f"エラーが発生しました: {symbol}, {e}")
 
     # 学習に使用する特徴量データフレームからシンボルカラムを除外
-    training_features_df = all_features_df.drop(columns=['Symbol'])
+    training_features_df = all_features_df.drop(columns=["Symbol"])
 
     # 処理時間
     end_time = time.time()  # 処理終了時刻を記録
@@ -76,6 +80,7 @@ def main():
 
     # モデルの予測と結果の確認
     model_predict_and_plot(gbm, training_features_df, all_features_df, symbol_data_dict)
+
 
 if __name__ == "__main__":
     main()
