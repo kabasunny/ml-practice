@@ -64,10 +64,10 @@ def get_technology_symbols():
 def get_financial_symbols():
     return [
         "8306.T",  # Mitsubishi UFJ Financial Group, Inc.
-        "8316.T",  # Sumitomo Mitsui Financial Group, Inc.
-        "8411.T",  # Mizuho Financial Group, Inc.
-        "8604.T",  # Nomura Holdings, Inc.
-        "8628.T"   # Matsui Securities Co., Ltd.
+        # "8316.T",  # Sumitomo Mitsui Financial Group, Inc.
+        # "8411.T",  # Mizuho Financial Group, Inc.
+        # "8604.T",  # Nomura Holdings, Inc.
+        # "8628.T"   # Matsui Securities Co., Ltd.
     ]
 
 def get_pharmaceutical_symbols():

@@ -1,12 +1,17 @@
 import pandas as pd
 
-
 def trading_strategy(
     data, start_date, stop_loss_percentage, trailing_stop_trigger, trailing_stop_update
 ):
+    # データの最終日付を取得
+    max_date = data.index.max()
+    
     # データが存在する最初の日付を取得
     while start_date not in data.index:
+        if start_date > max_date:
+            raise ValueError("開始日がデータの範囲外です。無限ループを防ぐため、処理を中断します。")
         start_date += pd.Timedelta(days=1)  # データに存在する日付になるまで日付を進める
+        # print(f"start_date : {start_date}")
 
     # 購入初日の設定
     purchase_date = start_date
@@ -26,9 +31,11 @@ def trading_strategy(
     # 初期化
     end_date = None
     end_price = None
+    # print(f"初期化完了")
 
     # 取引日ごとの確認
     for current_date in data.index[data.index.get_loc(start_date) :]:
+        # print(f"current_date : {current_date}")
         open_price = data.loc[current_date, "Open"]
         low_price = data.loc[current_date, "Low"]
         close_price = data.loc[current_date, "Close"]

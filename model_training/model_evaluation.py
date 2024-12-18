@@ -2,10 +2,7 @@ import pandas as pd
 from model_training.plot_buy_chart import plot_results
 from sklearn.metrics import confusion_matrix
 
-
-def model_predict_and_plot(
-    gbm, training_features_df, all_features_df, symbol_data_dict
-):
+def model_predict(gbm, training_features_df, all_features_df, symbol_data_dict):
     # モデルの予測と結果の確認
     X_test = training_features_df.drop("Label", axis=1)
     y_test = training_features_df["Label"]
@@ -22,11 +19,6 @@ def model_predict_and_plot(
         index=training_features_df.index,
     )
 
-    # 予測が外れた部分の表示
-    # incorrect_predictions = results_df[results_df["Actual"] != results_df["Predicted"]]
-    # print("予測が外れた部分:")
-    # print(incorrect_predictions)
-
     # カスタムの評価を呼び出す
     recall, not_recall, accuracy, precision, f1_score, npv = custom_metrics(
         y_test, y_pred_binary
@@ -39,15 +31,21 @@ def model_predict_and_plot(
     print(f"F1 Score [2 * (Precision * Recall) / (Precision + Recall)]: {f1_score:.4f}")
     print(f"NPV [TN / (TN + FN)]       : {npv:.4f}")
 
-    # 各シンボルごとのプロット
+    symbol_signals = {}  # シンボルごとの予測結果を格納する辞書
+
+    # 各シンボルごとの予測結果を抽出して辞書に格納
     for symbol in symbol_data_dict.keys():
         daily_data = symbol_data_dict[symbol]
         features_df = all_features_df[all_features_df["Symbol"] == symbol]
-        plot_results(daily_data, features_df, results_df, symbol)
+        symbol_signals[symbol] = results_df[
+            (results_df["Symbol"] == symbol) & (results_df["Predicted"] == 1)
+        ].index
+        # plot_results(daily_data, features_df, results_df, symbol) # 目視で用、重要！
 
+    return symbol_signals  # シンボルごとの予測結果を返す
 
 def custom_metrics(y_test, y_pred_binary):
-    # Recallのデバック
+    # Recallのデバッグ
     print(f"model_evaluation.py [len(y_test):{len(y_test)}]")
     cm = confusion_matrix(y_test, y_pred_binary)
     TN, FP, FN, TP = cm.ravel()
