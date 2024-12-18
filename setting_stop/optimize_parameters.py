@@ -4,9 +4,10 @@ from itertools import product
 from tqdm import tqdm
 from setting_stop.trading_strategy import trading_strategy
 
+
 def optimize_parameters(data, trade_start_date):
     results = []
-   
+
     # パラメータ最適化の範囲を設定
     stop_loss_percentages = np.arange(2, 5, 1)  # 1%から9%まで、1%刻み
     trailing_stop_triggers = np.arange(5, 8, 1)  # 5%から19%まで、1%刻み
@@ -16,11 +17,12 @@ def optimize_parameters(data, trade_start_date):
     parameter_combinations = list(
         product(stop_loss_percentages, trailing_stop_triggers, trailing_stop_updates)
     )
+    # +print(f"len(parameter_combinations) : {len(parameter_combinations)}")
 
     # グリッドサーチを実行
-    print("パラメータ最適化中...")
+    # print("パラメータ最適化中...")
     for stop_loss_percentage, trailing_stop_trigger, trailing_stop_update in tqdm(
-        parameter_combinations
+        parameter_combinations, disable=True
     ):
         try:
             # トレーディングストラテジーを実行

@@ -1,15 +1,17 @@
 from data_processing.fetch_stock_data import fetch_stock_data
 from labels.create_labels import create_labels
 from model_training.train_model import train_and_evaluate_model
+from model_training.model_evaluation import model_predict
 from features.create_features import create_features
 from setting_stop.optimize_parameters import optimize_parameters
 from setting_stop.trading_strategy import trading_strategy
 from setting_stop.plot_heatmap import plot_heatmap
-from setting_stop.print_results import print_results  # 新しいファイルをインポート
-from sectors import get_symbols_by_sector  # セクターリストの関数をインポート
+from setting_stop.print_results import print_results
+from sectors import get_symbols_by_sector
 import pandas as pd
 import numpy as np
 import time
+
 
 def main():
     start_time_features = time.time()  # 処理開始時刻を記録
@@ -47,7 +49,7 @@ def main():
             labeled_data = create_labels(daily_data)
 
             # 特徴量の作成
-            data_numbers = 4  # 不正解データが正解ラベルの 4倍
+            data_numbers = 3  # 不正解データが正解ラベルの 4倍
             features_df, features_all_df = create_features(
                 daily_data, trade_start_date, labeled_data, data_numbers
             )
@@ -82,7 +84,6 @@ def main():
     elapsed_time_features = end_time_features - start_time_features  # 経過時間を計算
     print(f"学習データ生成の処理時間: {elapsed_time_features:.2f}秒")  # 処理時間を表示
 
-
     # ------------------------------------------------------------------------------
 
     # モデルの学習と評価
@@ -90,18 +91,14 @@ def main():
 
     # ------------------------------------------------------------------------------
 
-
     start_time_optimize = time.time()  # 処理開始時刻を記録
-
-    # 遅延インポート
-    from model_training.model_evaluation import model_predict
 
     # モデルの予測とシンボル毎の結果の取得
     symbol_signals = model_predict(
         gbm, model_predict_features_df, all_features_all_df, symbol_data_dict
     )
-    print(f"symbol_signals : {len(symbol_signals)}")
-   
+    print(f"len(symbol_signals) : {len(symbol_signals)}")
+    print(f"銘柄毎の最適パラメータ抽出開始")
     optimal_params = []  # 最適解群の配列を用意する
     rejected_params = []  # 重複して排除されたパラメータを格納するリスト
 
@@ -110,35 +107,53 @@ def main():
         daily_data = symbol_data_dict[symbol]  # シンボルに紐づいた株価データを取り出し
         for signal_date in signals:  # daily_dataに紐づいたsymbol毎のsignalを抽出
             best_result, _ = optimize_parameters(daily_data, signal_date)
-            
+
             # 重複チェック
             is_duplicate = any(
-                param["stop_loss_percentage"] == best_result["stop_loss_percentage"] and
-                param["trailing_stop_trigger"] == best_result["trailing_stop_trigger"] and
-                param["trailing_stop_update"] == best_result["trailing_stop_update"]
+                param["stop_loss_percentage"] == best_result["stop_loss_percentage"]
+                and param["trailing_stop_trigger"]
+                == best_result["trailing_stop_trigger"]
+                and param["trailing_stop_update"] == best_result["trailing_stop_update"]
                 for param in optimal_params
             )
-            
+
             # 重複していない場合のみ追加、重複している場合は排除リストに追加
             if not is_duplicate:
                 optimal_params.append(best_result)  # 最適解群の配列に最適解を入れる
             else:
-                rejected_params.append(best_result)  # 重複して排除されたパラメータを格納
+                rejected_params.append(
+                    best_result
+                )  # 重複して排除されたパラメータを格納
 
     # 重複して排除されたパラメータを表示
     # print("重複して排除されたパラメータ:")
     # for param in rejected_params:
     #     print(f"損失割合: {param['stop_loss_percentage']}%, トレーリングストップトリガー: {param['trailing_stop_trigger']}%, トレーリングストップ更新: {param['trailing_stop_update']}%")
 
+    # 処理時間
+    end_time_optimize = time.time()  # 処理終了時刻を記録
+    elapsed_time_optimize = end_time_optimize - start_time_optimize  # 経過時間を計算
+    print(
+        f"銘柄毎の最適パラメータ抽出の処理時間: {elapsed_time_optimize:.2f}秒"
+    )  # 処理時間を表示
+
+    # ------------------------------------------------------------------------------
+
+    start_time_best = time.time()  # 処理開始時刻を記録
     # 最適解群の中から、全ての銘柄の全てのシグナルにエントリーした際、最も損益が高くなるストップオーダーのパラメータを見つける
+    print(
+        f"len(optimal_params)*len(symbol_data_dict)*len(symbol_signals): {len(optimal_params)*len(symbol_data_dict)*len(symbol_signals)}"
+    )
     best_params = None
     max_profit_loss = -np.inf  # 損益の初期値を最小値に設定
 
-    print(f"銘柄毎の最適パラメータ解群からベスト解の探索開始")
+    print(f"ベストな最適パラメータの探索開始")
     for params in optimal_params:  # パラメータを抽出
         sum_profit_loss = 0  # 各パラメータごとに総損益を計算
         for symbol, daily_data in symbol_data_dict.items():
-            for signal_date in symbol_signals[symbol]:  # daily_dataに紐づいたsymbol毎のsignalを抽出
+            for signal_date in symbol_signals[
+                symbol
+            ]:  # daily_dataに紐づいたsymbol毎のsignalを抽出
                 _, _, _, _, profit_loss = trading_strategy(
                     daily_data.copy(),
                     signal_date,
@@ -148,7 +163,7 @@ def main():
                 )
                 sum_profit_loss += profit_loss
                 # print(f"profit_loss {profit_loss} , sum_profit_loss += profit_loss : {sum_profit_loss}")
-            
+
         # 損益が現在の最大値を上回る場合、パラメータを更新
         if sum_profit_loss > max_profit_loss:
             max_profit_loss = sum_profit_loss
@@ -164,9 +179,12 @@ def main():
         print("最適なパラメータが見つかりませんでした。")
 
     # 処理時間
-    end_time_optimize = time.time()  # 処理終了時刻を記録
-    elapsed_time_optimize = end_time_optimize - start_time_optimize  # 経過時間を計算
-    print(f"最適パラメータ探索の処理時間: {elapsed_time_optimize:.2f}秒")  # 処理時間を表示
+    end_time_best = time.time()  # 処理終了時刻を記録
+    elapsed_time_best = end_time_best - start_time_best  # 経過時間を計算
+    print(
+        f"ベストな最適パラメータ探索の処理時間: {elapsed_time_best:.2f}秒"
+    )  # 処理時間を表示
+
 
 if __name__ == "__main__":
     main()

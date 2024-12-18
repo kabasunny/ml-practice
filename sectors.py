@@ -4,7 +4,7 @@ def get_symbols_by_sector(sector_number):
         2: "Technology",
         3: "Financial",
         4: "Pharmaceutical",
-        5: "Food"
+        5: "Food",
     }
 
     switcher = {
@@ -14,19 +14,20 @@ def get_symbols_by_sector(sector_number):
         4: get_pharmaceutical_symbols,
         5: get_food_symbols,
     }
-    
+
     # デフォルトとしてValueErrorを設定
     func = switcher.get(sector_number, lambda: ValueError("Invalid sector number"))
     symbols = func()
-    
+
     # セクター名を取得
     sector_name = sector_names.get(sector_number, "Unknown")
-    
+
     # 選択されたセクターの銘柄リストを表示
     print(f"Selected sector ({sector_number} - {sector_name})")
     print(f"symbols: {symbols}")
-    
+
     return symbols
+
 
 def get_automotive_symbols():
     return [
@@ -41,8 +42,9 @@ def get_automotive_symbols():
         "7205.T",  # Hino Motors, Ltd.
         "7211.T",  # Mitsubishi Fuso Truck and Bus Corporation
         "7224.T",  # Shizuoka Daihatsu Motor Co., Ltd.
-        "7266.T"   # Showa Corporation
+        "7266.T",  # Showa Corporation
     ]
+
 
 def get_technology_symbols():
     return [
@@ -58,17 +60,19 @@ def get_technology_symbols():
         "6724.T",  # Seiko Epson Corporation
         "9684.T",  # Square Enix Holdings Co., Ltd.
         "9766.T",  # Konami Holdings Corporation
-        "9697.T"   # Capcom Co., Ltd.
+        "9697.T",  # Capcom Co., Ltd.
     ]
+
 
 def get_financial_symbols():
     return [
         "8306.T",  # Mitsubishi UFJ Financial Group, Inc.
-        # "8316.T",  # Sumitomo Mitsui Financial Group, Inc.
+        "8316.T",  # Sumitomo Mitsui Financial Group, Inc.
         # "8411.T",  # Mizuho Financial Group, Inc.
         # "8604.T",  # Nomura Holdings, Inc.
         # "8628.T"   # Matsui Securities Co., Ltd.
     ]
+
 
 def get_pharmaceutical_symbols():
     return [
@@ -76,8 +80,9 @@ def get_pharmaceutical_symbols():
         "4503.T",  # Astellas Pharma Inc.
         "4506.T",  # Daiichi Sankyo Company, Limited
         "4519.T",  # Chugai Pharmaceutical Co., Ltd.
-        "4523.T"   # Eisai Co., Ltd.
+        "4523.T",  # Eisai Co., Ltd.
     ]
+
 
 def get_food_symbols():
     return [
@@ -85,5 +90,5 @@ def get_food_symbols():
         "2503.T",  # Kirin Holdings Company, Limited
         "2802.T",  # Ajinomoto Co., Inc.
         "2801.T",  # Kikkoman Corporation
-        "2914.T"   # Japan Tobacco Inc.
+        "2914.T",  # Japan Tobacco Inc.
     ]
