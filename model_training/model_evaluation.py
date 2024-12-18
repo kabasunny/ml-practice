@@ -20,7 +20,7 @@ def model_predict(gbm, training_features_df, all_features_df, symbol_data_dict):
     )
 
     # カスタムの評価を呼び出す
-    recall, not_recall, accuracy, precision, f1_score, npv = custom_metrics(
+    accuracy, precision, recall, not_recall, f1_score, npv = custom_metrics(
         y_test, y_pred_binary
     )
 

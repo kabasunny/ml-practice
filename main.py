@@ -7,6 +7,7 @@ from setting_stop.optimize_parameters import optimize_parameters
 from setting_stop.trading_strategy import trading_strategy
 from setting_stop.plot_heatmap import plot_heatmap
 from setting_stop.print_results import print_results
+from params_serch.best_params import find_best_params
 from sectors import get_symbols_by_sector
 import pandas as pd
 import numpy as np
@@ -15,10 +16,11 @@ import time
 
 def main():
     start_time_features = time.time()  # 処理開始時刻を記録
+    print(f"データ取得、学習データ、特徴量、ラベルの生成　開始")
 
     # セクター番号を指定
     # 1: 自動車セクター, 2: テクノロジーセクター, 3: 金融セクター, 4: 医薬品セクター, 5: 食品セクター
-    sector_number = 3  # ここでセクター番号を指定してください
+    sector_number = 1  # ここでセクター番号を指定してください
 
     # セクター番号に基づいて銘柄リストを取得
     symbols = get_symbols_by_sector(sector_number)
@@ -82,12 +84,21 @@ def main():
     # 処理時間
     end_time_features = time.time()  # 処理終了時刻を記録
     elapsed_time_features = end_time_features - start_time_features  # 経過時間を計算
-    print(f"学習データ生成の処理時間: {elapsed_time_features:.2f}秒")  # 処理時間を表示
+    print(f"データ取得、学習データ、特徴量、ラベルの生成　処理時間: {elapsed_time_features:.2f}秒")  # 処理時間を表示
 
     # ------------------------------------------------------------------------------
 
+    start_time_train = time.time()  # 処理開始時刻を記録
+
     # モデルの学習と評価
     gbm = train_and_evaluate_model(training_features_df)
+
+    # 処理時間
+    end_time_train = time.time()  # 処理終了時刻を記録
+    elapsed_time_train = end_time_train - start_time_train  # 経過時間を計算
+    print(
+        f"モデルのトレーニングの処理時間: {elapsed_time_train:.2f}秒"
+    )  # 処理時間を表示
 
     # ------------------------------------------------------------------------------
 
@@ -144,47 +155,36 @@ def main():
     print(
         f"len(optimal_params)*len(symbol_data_dict)*len(symbol_signals): {len(optimal_params)*len(symbol_data_dict)*len(symbol_signals)}"
     )
-    best_params = None
-    max_profit_loss = -np.inf  # 損益の初期値を最小値に設定
 
-    print(f"ベストな最適パラメータの探索開始")
-    for params in optimal_params:  # パラメータを抽出
-        sum_profit_loss = 0  # 各パラメータごとに総損益を計算
-        for symbol, daily_data in symbol_data_dict.items():
-            for signal_date in symbol_signals[
-                symbol
-            ]:  # daily_dataに紐づいたsymbol毎のsignalを抽出
-                _, _, _, _, profit_loss = trading_strategy(
-                    daily_data.copy(),
-                    signal_date,
-                    params["stop_loss_percentage"],
-                    params["trailing_stop_trigger"],
-                    params["trailing_stop_update"],
-                )
-                sum_profit_loss += profit_loss
-                # print(f"profit_loss {profit_loss} , sum_profit_loss += profit_loss : {sum_profit_loss}")
-
-        # 損益が現在の最大値を上回る場合、パラメータを更新
-        if sum_profit_loss > max_profit_loss:
-            max_profit_loss = sum_profit_loss
-            best_params = params
+    best_params, max_profit_loss, param_results = find_best_params(optimal_params, symbol_data_dict, symbol_signals, trading_strategy)
 
     print(f"総損益: {max_profit_loss:.2f}%")
     if best_params is not None and not best_params.empty:
         print("最も損益が高かったストップオーダーのパラメータ:")
-        print(f"初回LC値: {best_params['stop_loss_percentage']}%")
+        print(f"初期LC値: {best_params['stop_loss_percentage']}%")
         print(f"TSトリガー値: {best_params['trailing_stop_trigger']}%")
         print(f"TS更新値: {best_params['trailing_stop_update']}%")
     else:
         print("最適なパラメータが見つかりませんでした。")
 
+    # ベスト3とワースト3のパラメータを表示
+    sorted_params = sorted(param_results, key=lambda x: x["sum_profit_loss"], reverse=True)
+    print("\nBEST3のパラメータ:")
+    for i in range(min(3, len(sorted_params))):
+        params = sorted_params[i]["params"]
+        print(f"初期LC値: {params['stop_loss_percentage']}%, TSトリガー値: {params['trailing_stop_trigger']}%, TS更新値: {params['trailing_stop_update']}%, 総損益: {sorted_params[i]['sum_profit_loss']:.2f}%, 勝率: {sorted_params[i]['win_rate']:.2f}")
+
+    print("\nWORST3のパラメータ:")
+    for i in range(min(3, len(sorted_params))):
+        params = sorted_params[-(i+1)]["params"]
+        print(f"初期LC値: {params['stop_loss_percentage']}%, TSトリガー値: {params['trailing_stop_trigger']}%, TS更新値: {params['trailing_stop_update']}%, 総損益: {sorted_params[-(i+1)]['sum_profit_loss']:.2f}%, 勝率: {sorted_params[-(i+1)]['win_rate']:.2f}")
+
     # 処理時間
     end_time_best = time.time()  # 処理終了時刻を記録
     elapsed_time_best = end_time_best - start_time_best  # 経過時間を計算
     print(
-        f"ベストな最適パラメータ探索の処理時間: {elapsed_time_best:.2f}秒"
+        f"ベストとワーストの最適パラメータ探索の処理時間: {elapsed_time_best:.2f}秒"
     )  # 処理時間を表示
-
 
 if __name__ == "__main__":
     main()

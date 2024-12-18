@@ -37,10 +37,10 @@ def train_and_evaluate_model(features_df):
 
     # 学習データ数とテストデータ数を表示
     print(f"X_train: 訓練データの特徴量（説明変数）  : {len(X_train)}")
-    print(f"X_test : テストデータの特徴量（説明変数）: {len(X_test)}")
     print(
         f"y_train: 訓練データのラベル（目的変数）  : {len(y_train)}"
     )  # このラベルを用いてモデルを訓練
+    print(f"X_test : テストデータの特徴量（説明変数）: {len(X_test)}")
     print(
         f"y_test : テストデータのラベル（目的変数）: {len(y_test)}"
     )  # このラベルを用いてモデルの予測性能を評価
@@ -99,7 +99,7 @@ def train_and_evaluate_model(features_df):
     importance_df = importance_df.sort_values(by="Importance", ascending=False)
 
     # 特徴量重要度をターミナルに表示
-    print("\n特徴量の重要度:")
+    print("特徴量の重要度:")
     print(importance_df)
 
     # # 特徴量重要度のプロット

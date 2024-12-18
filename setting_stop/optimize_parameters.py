@@ -10,8 +10,8 @@ def optimize_parameters(data, trade_start_date):
 
     # パラメータ最適化の範囲を設定
     stop_loss_percentages = np.arange(2, 5, 1)  # 1%から9%まで、1%刻み
-    trailing_stop_triggers = np.arange(5, 8, 1)  # 5%から19%まで、1%刻み
-    trailing_stop_updates = np.arange(5, 8, 1)  # 2%から9.5%まで、0.5%刻み
+    trailing_stop_triggers = np.arange(5, 10, 1)  # 5%から19%まで、1%刻み
+    trailing_stop_updates = np.arange(5, 10, 1)  # 2%から9.5%まで、0.5%刻み
 
     # パラメータの全組み合わせを生成
     parameter_combinations = list(
