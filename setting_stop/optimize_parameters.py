@@ -4,23 +4,20 @@ from itertools import product
 from tqdm import tqdm
 from setting_stop.trading_strategy import trading_strategy
 
-
 def optimize_parameters(data, trade_start_date):
     results = []
 
     # パラメータ最適化の範囲を設定
-    stop_loss_percentages = np.arange(2, 5, 1)  # 1%から9%まで、1%刻み
-    trailing_stop_triggers = np.arange(5, 10, 1)  # 5%から19%まで、1%刻み
-    trailing_stop_updates = np.arange(5, 10, 1)  # 2%から9.5%まで、0.5%刻み
+    stop_loss_percentages = np.arange(1, 5, 1)  # 1%から4%まで、1%刻み
+    trailing_stop_triggers = np.arange(5, 20, 1)  # 5%から19%まで、1%刻み
+    trailing_stop_updates = np.arange(5, 15, 1)  # 5%から14%まで、1%刻み
 
     # パラメータの全組み合わせを生成
     parameter_combinations = list(
         product(stop_loss_percentages, trailing_stop_triggers, trailing_stop_updates)
     )
-    # +print(f"len(parameter_combinations) : {len(parameter_combinations)}")
 
     # グリッドサーチを実行
-    # print("パラメータ最適化中...")
     for stop_loss_percentage, trailing_stop_trigger, trailing_stop_update in tqdm(
         parameter_combinations, disable=True
     ):
@@ -53,8 +50,11 @@ def optimize_parameters(data, trade_start_date):
     # 結果をDataFrameに変換
     results_df = pd.DataFrame(results)
 
-    # 損益でソートして最適なパラメータを見つける
-    sorted_results = results_df.sort_values(by="profit_loss", ascending=False)
+    # 損益でソートして最適なパラメータと最悪なパラメータを見つける
+    # 最良の結果が複数ある場合、stop_loss_percentages, trailing_stop_triggers, trailing_stop_updatesの値がそれぞれ最も小さいケースを選ぶ
+    sorted_results = results_df.sort_values(by=["profit_loss", "stop_loss_percentage", "trailing_stop_trigger", "trailing_stop_update"], ascending=[False, True, True, True])
+    # ascending パラメータには、各列に対して昇順（True）または降順（False）でソートするかを指定
     best_result = sorted_results.iloc[0]
+    worst_result = sorted_results.iloc[-1]
 
-    return best_result, results_df
+    return best_result, worst_result, results_df

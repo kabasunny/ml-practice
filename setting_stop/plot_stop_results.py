@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 
-def plot_stop_results(data, purchase_date, purchase_price, end_date, end_price):
+def plot_stop_results(title, data, purchase_date, purchase_price, end_date, end_price):
     plt.figure(figsize=(14, 7))
 
     # 株価の推移をプロット
@@ -29,7 +29,7 @@ def plot_stop_results(data, purchase_date, purchase_price, end_date, end_price):
 
     plt.xlabel("Date")
     plt.ylabel("Price")
-    plt.title("Stock Trading Strategy Results")
+    plt.title(f"{title} Stock Trading Strategy Results")
     plt.legend()
     plt.xticks(rotation=45)
     plt.grid(True)
