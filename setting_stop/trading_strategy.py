@@ -1,15 +1,23 @@
 import pandas as pd
 
+
 def trading_strategy(
     data, start_date, stop_loss_percentage, trailing_stop_trigger, trailing_stop_update
 ):
+    # パラメータ最適化の範囲を設定
+    # stop_loss_percentages : エントリー時のロスカット(ストップ位置の設定割合)
+    # trailing_stop_triggers : TSを引き上げるトリガーとなる閾値の設定割合
+    # trailing_stop_updates : トリガー発動時に、現在価格に対するストップ位置の設定割合
+
     # データの最終日付を取得
     max_date = data.index.max()
-    
+
     # データが存在する最初の日付を取得
     while start_date not in data.index:
         if start_date > max_date:
-            raise ValueError("開始日がデータの範囲外です。無限ループを防ぐため、処理を中断します。")
+            raise ValueError(
+                "開始日がデータの範囲外です。無限ループを防ぐため、処理を中断"
+            )
         start_date += pd.Timedelta(days=1)  # データに存在する日付になるまで日付を進める
         # print(f"start_date : {start_date}")
 

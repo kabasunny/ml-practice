@@ -1,14 +1,14 @@
 import numpy as np
 
 
-def find_best_params(
+def find_worst_params(
     optimal_params, symbol_data_dict, symbol_signals, trading_strategy
 ):
-    best_params = None
-    max_profit_loss = -np.inf  # 損益の初期値を最小値に設定
+    worst_params = None
+    min_profit_loss = np.inf  # 損益の初期値を最大値に設定
     param_results = []
 
-    print(f"ベストな最適パラメータの探索開始")
+    print(f"ワーストな最適パラメータの探索開始")
     for params in optimal_params:  # パラメータを抽出
         sum_profit_loss = 0  # 各パラメータごとに総損益を計算
         pluses = 0  # 勝率計算用
@@ -44,9 +44,9 @@ def find_best_params(
             }
         )
 
-        # 損益が現在の最大値を上回る場合、パラメータを更新
-        if sum_profit_loss > max_profit_loss:
-            max_profit_loss = sum_profit_loss
-            best_params = params
+        # 損益が現在の最小値を下回る場合、パラメータを更新
+        if sum_profit_loss < min_profit_loss:
+            min_profit_loss = sum_profit_loss
+            worst_params = params
 
-    return best_params, max_profit_loss, param_results
+    return worst_params, min_profit_loss, param_results

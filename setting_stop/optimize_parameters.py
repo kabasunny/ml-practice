@@ -4,13 +4,14 @@ from itertools import product
 from tqdm import tqdm
 from setting_stop.trading_strategy import trading_strategy
 
+
 def optimize_parameters(data, trade_start_date):
     results = []
 
     # パラメータ最適化の範囲を設定
-    stop_loss_percentages = np.arange(1, 5, 1)  # 1%から4%まで、1%刻み
-    trailing_stop_triggers = np.arange(5, 20, 1)  # 5%から19%まで、1%刻み
-    trailing_stop_updates = np.arange(5, 15, 1)  # 5%から14%まで、1%刻み
+    stop_loss_percentages = np.arange(1, 3, 1)  # エントリー時のロスカット
+    trailing_stop_triggers = np.arange(5, 8, 1)  # TSを引き上げる閾値
+    trailing_stop_updates = np.arange(5, 8, 1)  # 現在価格に対するストップ
 
     # パラメータの全組み合わせを生成
     parameter_combinations = list(
@@ -52,7 +53,15 @@ def optimize_parameters(data, trade_start_date):
 
     # 損益でソートして最適なパラメータと最悪なパラメータを見つける
     # 最良の結果が複数ある場合、stop_loss_percentages, trailing_stop_triggers, trailing_stop_updatesの値がそれぞれ最も小さいケースを選ぶ
-    sorted_results = results_df.sort_values(by=["profit_loss", "stop_loss_percentage", "trailing_stop_trigger", "trailing_stop_update"], ascending=[False, True, True, True])
+    sorted_results = results_df.sort_values(
+        by=[
+            "profit_loss",
+            "stop_loss_percentage",
+            "trailing_stop_trigger",
+            "trailing_stop_update",
+        ],
+        ascending=[False, True, True, True],
+    )
     # ascending パラメータには、各列に対して昇順（True）または降順（False）でソートするかを指定
     best_result = sorted_results.iloc[0]
     worst_result = sorted_results.iloc[-1]

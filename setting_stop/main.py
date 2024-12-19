@@ -24,8 +24,8 @@ from print_results import print_results  # 新しいファイルをインポー�
 
 # 使用例
 symbol = "7203.T"  # トヨタ自動車のティッカーシンボル
-trade_start_date = pd.Timestamp("2018-12-26")  # 買いを入れる日
-period_days = 365 * 1  # 前後1年を期間とする例
+trade_start_date = pd.Timestamp("2019-01-01")  # 買いを入れる日
+period_days = 365 * 2  # 前後2年を期間とする例
 
 # start_date と end_date を trade_start_date を基に設定
 start_date = trade_start_date - pd.Timedelta(days=period_days)
@@ -39,21 +39,25 @@ print(f"銘柄コード: {symbol} , チャート期間: {start_date.date()} 〜 
 best_result, worst_result, results_df = optimize_parameters(data, trade_start_date)
 
 # ベスト結果のトレーディングストラテジーの再実行
-best_purchase_date, best_purchase_price, best_end_date, best_end_price, _ = trading_strategy(
-    data.copy(),
-    trade_start_date,
-    best_result["stop_loss_percentage"],
-    best_result["trailing_stop_trigger"],
-    best_result["trailing_stop_update"],
+best_purchase_date, best_purchase_price, best_end_date, best_end_price, _ = (
+    trading_strategy(
+        data.copy(),
+        trade_start_date,
+        best_result["stop_loss_percentage"],
+        best_result["trailing_stop_trigger"],
+        best_result["trailing_stop_update"],
+    )
 )
 
 # ワースト結果のトレーディングストラテジーの再実行
-worst_purchase_date, worst_purchase_price, worst_end_date, worst_end_price, _ = trading_strategy(
-    data.copy(),
-    trade_start_date,
-    worst_result["stop_loss_percentage"],
-    worst_result["trailing_stop_trigger"],
-    worst_result["trailing_stop_update"],
+worst_purchase_date, worst_purchase_price, worst_end_date, worst_end_price, _ = (
+    trading_strategy(
+        data.copy(),
+        trade_start_date,
+        worst_result["stop_loss_percentage"],
+        worst_result["trailing_stop_trigger"],
+        worst_result["trailing_stop_update"],
+    )
 )
 
 # 結果の表示
@@ -61,10 +65,19 @@ print_results(data, trade_start_date, best_result, worst_result)
 
 # ベスト結果のプロット
 data["Date"] = data.index  # Date列を追加
-plot_stop_results("BEST", data, best_purchase_date, best_purchase_price, best_end_date, best_end_price)
+plot_stop_results(
+    "BEST", data, best_purchase_date, best_purchase_price, best_end_date, best_end_price
+)
 
 # ワースト結果のプロット
-plot_stop_results("WORST", data, worst_purchase_date, worst_purchase_price, worst_end_date, worst_end_price)
+plot_stop_results(
+    "WORST",
+    data,
+    worst_purchase_date,
+    worst_purchase_price,
+    worst_end_date,
+    worst_end_price,
+)
 
 # # 結果をCSVファイルに保存
 # results_df.to_csv("optimization_results.csv", index=False)
@@ -72,6 +85,15 @@ plot_stop_results("WORST", data, worst_purchase_date, worst_purchase_price, wors
 
 # 最適化の結果をヒートマップでプロット
 fixed_trigger = best_result[
+    "trailing_stop_trigger"
+]  # 最適なトレーリングストップトリガーを固定
+subset = results_df[results_df["trailing_stop_trigger"] == fixed_trigger]
+
+# ヒートマップをプロット
+plot_heatmap(subset, fixed_trigger)
+
+# 最適化の結果をヒートマップでプロット
+fixed_trigger = worst_result[
     "trailing_stop_trigger"
 ]  # 最適なトレーリングストップトリガーを固定
 subset = results_df[results_df["trailing_stop_trigger"] == fixed_trigger]

@@ -8,6 +8,8 @@ from setting_stop.trading_strategy import trading_strategy
 from setting_stop.plot_heatmap import plot_heatmap
 from setting_stop.print_results import print_results
 from params_serch.best_params import find_best_params
+from params_serch.worst_params import find_worst_params
+from params_serch.display_params import display_params
 from sectors import get_symbols_by_sector
 import pandas as pd
 import numpy as np
@@ -16,11 +18,11 @@ import time
 
 def main():
     start_time_features = time.time()  # 処理開始時刻を記録
-    print(f"データ取得、学習データ、特徴量、ラベルの生成　開始")
+    print(f"データ取得、学習データ、特徴量、ラベルの生成 開始")
 
     # セクター番号を指定
     # 1: 自動車セクター, 2: テクノロジーセクター, 3: 金融セクター, 4: 医薬品セクター, 5: 食品セクター
-    sector_number = 1  # ここでセクター番号を指定してください
+    sector_number = 3  # ここでセクター番号を指定してください
 
     # セクター番号に基づいて銘柄リストを取得
     symbols = get_symbols_by_sector(sector_number)
@@ -51,7 +53,7 @@ def main():
             labeled_data = create_labels(daily_data)
 
             # 特徴量の作成
-            data_numbers = 3  # 不正解データが正解ラベルの 4倍
+            data_numbers = 2  # 不正解データが正解ラベルの 4倍
             features_df, features_all_df = create_features(
                 daily_data, trade_start_date, labeled_data, data_numbers
             )
@@ -84,7 +86,9 @@ def main():
     # 処理時間
     end_time_features = time.time()  # 処理終了時刻を記録
     elapsed_time_features = end_time_features - start_time_features  # 経過時間を計算
-    print(f"データ取得、学習データ、特徴量、ラベルの生成　処理時間: {elapsed_time_features:.2f}秒")  # 処理時間を表示
+    print(
+        f"データ取得、学習データ、特徴量、ラベルの生成 処理時間: {elapsed_time_features:.2f}秒"
+    )  # 処理時間を表示
 
     # ------------------------------------------------------------------------------
 
@@ -111,16 +115,17 @@ def main():
     print(f"len(symbol_signals) : {len(symbol_signals)}")
     print(f"銘柄毎の最適パラメータ抽出開始")
     optimal_params = []  # 最適解群の配列を用意する
+    least_optimal_params = []  # 最悪解群の配列を用意する
     rejected_params = []  # 重複して排除されたパラメータを格納するリスト
 
     # ストップオーダーのパラメータ最適化の実行
     for symbol, signals in symbol_signals.items():
         daily_data = symbol_data_dict[symbol]  # シンボルに紐づいた株価データを取り出し
         for signal_date in signals:  # daily_dataに紐づいたsymbol毎のsignalを抽出
-            best_result, _ = optimize_parameters(daily_data, signal_date)
+            best_result, worst_result, _ = optimize_parameters(daily_data, signal_date)
 
             # 重複チェック
-            is_duplicate = any(
+            is_duplicate_best = any(
                 param["stop_loss_percentage"] == best_result["stop_loss_percentage"]
                 and param["trailing_stop_trigger"]
                 == best_result["trailing_stop_trigger"]
@@ -128,12 +133,30 @@ def main():
                 for param in optimal_params
             )
 
+            is_duplicate_worst = any(
+                param["stop_loss_percentage"] == worst_result["stop_loss_percentage"]
+                and param["trailing_stop_trigger"]
+                == worst_result["trailing_stop_trigger"]
+                and param["trailing_stop_update"]
+                == worst_result["trailing_stop_update"]
+                for param in least_optimal_params
+            )
+
             # 重複していない場合のみ追加、重複している場合は排除リストに追加
-            if not is_duplicate:
+            if not is_duplicate_best:
                 optimal_params.append(best_result)  # 最適解群の配列に最適解を入れる
             else:
                 rejected_params.append(
                     best_result
+                )  # 重複して排除されたパラメータを格納
+
+            if not is_duplicate_worst:
+                least_optimal_params.append(
+                    worst_result
+                )  # 最悪解群の配列に最悪解を入れる
+            else:
+                rejected_params.append(
+                    worst_result
                 )  # 重複して排除されたパラメータを格納
 
     # 重複して排除されたパラメータを表示
@@ -147,7 +170,6 @@ def main():
     print(
         f"銘柄毎の最適パラメータ抽出の処理時間: {elapsed_time_optimize:.2f}秒"
     )  # 処理時間を表示
-
     # ------------------------------------------------------------------------------
 
     start_time_best = time.time()  # 処理開始時刻を記録
@@ -156,35 +178,49 @@ def main():
         f"len(optimal_params)*len(symbol_data_dict)*len(symbol_signals): {len(optimal_params)*len(symbol_data_dict)*len(symbol_signals)}"
     )
 
-    best_params, max_profit_loss, param_results = find_best_params(optimal_params, symbol_data_dict, symbol_signals, trading_strategy)
+    best_params, max_profit_loss, param_results = find_best_params(
+        optimal_params, symbol_data_dict, symbol_signals, trading_strategy
+    )
 
-    print(f"総損益: {max_profit_loss:.2f}%")
-    if best_params is not None and not best_params.empty:
-        print("最も損益が高かったストップオーダーのパラメータ:")
-        print(f"初期LC値: {best_params['stop_loss_percentage']}%")
-        print(f"TSトリガー値: {best_params['trailing_stop_trigger']}%")
-        print(f"TS更新値: {best_params['trailing_stop_update']}%")
-    else:
-        print("最適なパラメータが見つかりませんでした。")
-
-    # ベスト3とワースト3のパラメータを表示
-    sorted_params = sorted(param_results, key=lambda x: x["sum_profit_loss"], reverse=True)
-    print("\nBEST3のパラメータ:")
-    for i in range(min(3, len(sorted_params))):
-        params = sorted_params[i]["params"]
-        print(f"初期LC値: {params['stop_loss_percentage']}%, TSトリガー値: {params['trailing_stop_trigger']}%, TS更新値: {params['trailing_stop_update']}%, 総損益: {sorted_params[i]['sum_profit_loss']:.2f}%, 勝率: {sorted_params[i]['win_rate']:.2f}")
-
-    print("\nWORST3のパラメータ:")
-    for i in range(min(3, len(sorted_params))):
-        params = sorted_params[-(i+1)]["params"]
-        print(f"初期LC値: {params['stop_loss_percentage']}%, TSトリガー値: {params['trailing_stop_trigger']}%, TS更新値: {params['trailing_stop_update']}%, 総損益: {sorted_params[-(i+1)]['sum_profit_loss']:.2f}%, 勝率: {sorted_params[-(i+1)]['win_rate']:.2f}")
+    display_params(best_params, max_profit_loss, param_results, "良い : 最適な群で")
 
     # 処理時間
     end_time_best = time.time()  # 処理終了時刻を記録
     elapsed_time_best = end_time_best - start_time_best  # 経過時間を計算
     print(
-        f"ベストとワーストの最適パラメータ探索の処理時間: {elapsed_time_best:.2f}秒"
+        f"セクター全体の最適パラメータ探索の処理時間: {elapsed_time_best:.2f}秒"
     )  # 処理時間を表示
+
+    # ------------------------------------------------------------------------------
+
+    start_time_least_optimal = time.time()  # 処理開始時刻を記録
+    # 最適でない解群の中から、全ての銘柄の全てのシグナルにエントリーした際、最も損益が低くなるストップオーダーのパラメータを見つける
+    print(
+        f"len(least_optimal_params)*len(symbol_data_dict)*len(symbol_signals): {len(least_optimal_params)*len(symbol_data_dict)*len(symbol_signals)}"
+    )
+
+    least_optimal_params_best, min_profit_loss, least_param_results = find_worst_params(
+        least_optimal_params, symbol_data_dict, symbol_signals, trading_strategy
+    )
+
+    display_params(
+        least_optimal_params_best,
+        min_profit_loss,
+        least_param_results,
+        "悪い : 最適から遠い群で",
+    )
+
+    # 処理時間
+    end_time_least_optimal = time.time()  # 処理終了時刻を記録
+    elapsed_time_least_optimal = (
+        end_time_least_optimal - start_time_least_optimal
+    )  # 経過時間を計算
+    print(
+        f"最適でないパラメータ探索の処理時間: {elapsed_time_least_optimal:.2f}秒"
+    )  # 処理時間を表示
+
+    # ------------------------------------------------------------------------------
+
 
 if __name__ == "__main__":
     main()
