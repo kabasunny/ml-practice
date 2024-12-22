@@ -1,26 +1,21 @@
-
-import numpy as np
-import pandas as pd
 from labels.detect_troughs import detect_troughs
-from data_processing.fetch_stock_data import fetch_stock_data
-import matplotlib.pyplot as plt
 
-# pandas.DataFrame を戻す
+
+# pandas.DataFrame を取り pandas.DataFrame を戻す
 def create_labels(daily_data):
     """
     日足の終値が週足トラフと同じ値であるものをラベル付けする関数
     """
+    # print(f"daily_data:\n{daily_data}")  # pandas.DataFrame
+    # print(f'daily_data["Close"]:\n{daily_data["Close"]}')  # pandas.Series
+
     # 日足トラフのみ解析
     troughs, _, _, _, _ = detect_troughs(daily_data["Close"])
 
-    # daily_data が Series の場合は DataFrame に変換
-    if isinstance(daily_data, pd.Series):
-        daily_data = daily_data.to_frame(name="Close")
-        print('to pd.DataFrame daily_data = daily_data.to_frame(name="Close")')
-
     # Label 列を初期化
-    daily_data["Label"] = 0
-
+    daily_data["Label"] = (
+        0  # 元々存在しなかった Label 列が daily_data データフレームに追加される
+    )
     selected_troughs = []
 
     # 日足トラフの検出幅の設定
@@ -44,6 +39,9 @@ def create_labels(daily_data):
         # 条件に応じてトラフを追加または削除
         if selected_troughs:
             last_trough = selected_troughs[-1]
+            # daily_data のインデックスは DatetimeIndex 型で、各要素が pandas.Timestamp 型
+            # pandas.Timestamp 型の日付同士の差分を計算すると timedelta オブジェクトが生成
+            # .days 属性を使って日数部分を抽出する
             if (min_close_date - last_trough).days > (pre_x + post_x):
                 selected_troughs.append(min_close_date)
             elif (min_close_date - last_trough).days <= (
@@ -59,9 +57,58 @@ def create_labels(daily_data):
     for trough_date in selected_troughs:
         daily_data.at[trough_date, "Label"] = 1
 
-    # ラベル間のスパン（データ個数）を計算してprint
-    # for i in range(1, len(selected_troughs)):
-    #     span = (selected_troughs[i] - selected_troughs[i - 1]).days
-    #     print(f'Span between index {i-1} and index {i}: {span} days')
+    # labeled_data を daily_data として設定
+    labeled_data = daily_data
 
-    return daily_data # pandas.DataFrame を戻す
+    # print(f"return labeled_data:\n{labeled_data}")  # pandas.DataFrame
+
+    return labeled_data  # 修正: labeled_data を戻す
+
+
+# [*********************100%***********************]  1 of 1 completed
+# daily_data:
+#               Open    High     Low   Close    Adj Close    Volume
+# Date
+# 2003-01-01   638.0   638.0   638.0   638.0   378.700287         0
+# 2003-01-02   638.0   638.0   638.0   638.0   378.700287         0
+# 2003-01-03   638.0   638.0   638.0   638.0   378.700287         0
+# 2003-01-06   650.0   654.0   648.0   650.0   385.823090  17657000
+# 2003-01-07   658.0   660.0   644.0   648.0   384.635986  29539000
+# ...            ...     ...     ...     ...          ...       ...
+# 2023-12-25  2525.0  2553.0  2514.5  2537.0  2470.584473  19273800
+# 2023-12-26  2543.0  2544.5  2520.5  2541.0  2474.479980  17223900
+# 2023-12-27  2557.5  2583.5  2547.0  2583.0  2515.380371  26896000
+# 2023-12-28  2555.0  2573.0  2539.0  2556.0  2489.087158  17822300
+# 2023-12-29  2572.0  2615.5  2569.0  2590.5  2522.683838  26860500
+
+# [5222 rows x 6 columns]
+# daily_data["Close"]:
+# Date
+# 2003-01-01     638.0
+# 2003-01-02     638.0
+# 2003-01-03     638.0
+# 2003-01-06     650.0
+# 2003-01-07     648.0
+#                ...
+# 2023-12-25    2537.0
+# 2023-12-26    2541.0
+# 2023-12-27    2583.0
+# 2023-12-28    2556.0
+# 2023-12-29    2590.5
+# Name: Close, Length: 5222, dtype: float64
+# return labeled_data:
+#               Open    High     Low   Close    Adj Close    Volume  Label
+# Date
+# 2003-01-01   638.0   638.0   638.0   638.0   378.700287         0      0
+# 2003-01-02   638.0   638.0   638.0   638.0   378.700287         0      0
+# 2003-01-03   638.0   638.0   638.0   638.0   378.700287         0      0
+# 2003-01-06   650.0   654.0   648.0   650.0   385.823090  17657000      0
+# 2003-01-07   658.0   660.0   644.0   648.0   384.635986  29539000      0
+# ...            ...     ...     ...     ...          ...       ...    ...
+# 2023-12-25  2525.0  2553.0  2514.5  2537.0  2470.584473  19273800      0
+# 2023-12-26  2543.0  2544.5  2520.5  2541.0  2474.479980  17223900      0
+# 2023-12-27  2557.5  2583.5  2547.0  2583.0  2515.380371  26896000      0
+# 2023-12-28  2555.0  2573.0  2539.0  2556.0  2489.087158  17822300      0
+# 2023-12-29  2572.0  2615.5  2569.0  2590.5  2522.683838  26860500      0
+
+# [5222 rows x 7 columns]

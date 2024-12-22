@@ -2,8 +2,9 @@ import numpy as np
 from scipy.signal import find_peaks
 from scipy.stats import mode
 
-# トラフ（谷）検出関数
-def detect_troughs(prices):
+
+# トラフ（谷）検出関数 この出力を正解ラベルに設定する
+def detect_troughs(prices):  # pandas.Series を取る
     # 終値のデータから谷（安値）を検出
     troughs, _ = find_peaks(-prices)
 
@@ -11,14 +12,23 @@ def detect_troughs(prices):
     trough_intervals = np.diff(troughs)
 
     # 谷間の中央値を計算
-    median_trough_cycle = np.median(trough_intervals) if len(trough_intervals) > 0 else None
+    median_trough_cycle = (
+        np.median(trough_intervals) if len(trough_intervals) > 0 else None
+    )
 
     # 谷間の平均サイクルを少数第一位まで計算
-    avg_trough_cycle = round(np.mean(trough_intervals), 1) if len(trough_intervals) > 0 else None
+    avg_trough_cycle = (
+        round(np.mean(trough_intervals), 1) if len(trough_intervals) > 0 else None
+    )
 
     # 谷間の平均誤差のパーセンテージを少数第一位まで計算
     mean_absolute_error_trough = (
-        round(np.mean(np.abs(trough_intervals - avg_trough_cycle)) / avg_trough_cycle * 100, 1)
+        round(
+            np.mean(np.abs(trough_intervals - avg_trough_cycle))
+            / avg_trough_cycle
+            * 100,
+            1,
+        )
         if avg_trough_cycle
         else None
     )
@@ -40,5 +50,5 @@ def detect_troughs(prices):
         median_trough_cycle,
         mean_absolute_error_trough,
         mode_trough_cycle,
+        # 前回、前々回…と数回前のトラフを追加するのはどうか？
     )
-
