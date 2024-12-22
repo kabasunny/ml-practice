@@ -25,23 +25,45 @@ def fetch_and_prepare_data(
                 print(f"データが見つかりませんでした: {symbol}")
                 continue
             labeled_data = create_labels(daily_data)
-            features_df_for_train, features_all_df_evaluate = create_features(
+            features_df_for_train, features_df_evaluate_for_evaluate = create_features(
                 daily_data, trade_start_date, labeled_data, data_numbers
             )
+
+            # 不正解ラベルのデータ数と正解ラベルのデータ数を表示
+            label_counts_tr2 = features_df_for_train["Label"].value_counts()
+            print(f"tr2不正解ラベル数: {label_counts_tr2[0]}")
+            print(f"tr2正解ラベル数  : {label_counts_tr2[1]}")
+
+            # 不正解ラベルのデータ数と正解ラベルのデータ数を表示
+            label_counts_ev2 = features_df_evaluate_for_evaluate["Label"].value_counts()
+            print(f"ev2不正解ラベル数: {label_counts_ev2[0]}")
+            print(f"ev2正解ラベル数  : {label_counts_ev2[1]}")
+
             features_df_for_train["Symbol"] = symbol
-            features_all_df_evaluate["Symbol"] = symbol
+            features_df_evaluate_for_evaluate["Symbol"] = symbol
             features_df_for_train.dropna(inplace=True)
-            features_all_df_evaluate.dropna(inplace=True)
+            features_df_evaluate_for_evaluate.dropna(inplace=True)
             all_features_df_for_train = pd.concat(
                 [all_features_df_for_train, features_df_for_train]
             )
             all_features_df_for_evaluate = pd.concat(
-                [all_features_df_for_evaluate, features_all_df_evaluate]
+                [all_features_df_for_evaluate, features_df_evaluate_for_evaluate]
             )
             symbol_data_dict[symbol] = daily_data
             time.sleep(1)
         except Exception as e:
             print(f"エラーが発生しました: {symbol}, {e}")
+
+            
+        # 不正解ラベルのデータ数と正解ラベルのデータ数を表示
+        label_counts_tr = all_features_df_for_train["Label"].value_counts()
+        print(f"tr3不正解ラベル数: {label_counts_tr[0]}")
+        print(f"tr3正解ラベル数  : {label_counts_tr[1]}")
+
+        # 不正解ラベルのデータ数と正解ラベルのデータ数を表示
+        label_counts_ev = all_features_df_for_evaluate["Label"].value_counts()
+        print(f"ev3不正解ラベル数: {label_counts_ev[0]}")
+        print(f"ev3正解ラベル数  : {label_counts_ev[1]}")
 
     return all_features_df_for_train, all_features_df_for_evaluate, symbol_data_dict
 
@@ -103,6 +125,7 @@ def main():
 
     # --------------------------モデルのトレーニング
     start_time_train = time.time()
+    
     gbm = train_and_evaluate_model(training_features_df)
     end_time_train = time.time()
     print(f"モデルのトレーニングの処理時間: {end_time_train - start_time_train:.2f}秒")

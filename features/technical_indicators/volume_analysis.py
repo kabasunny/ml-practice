@@ -1,6 +1,5 @@
 import pandas as pd
 
-
 def calculate_volume_features(data, frequency="daily"):
     """
     日足または週足の出来高の当日、1日前、2日前、…9日前の値と、
@@ -20,8 +19,9 @@ def calculate_volume_features(data, frequency="daily"):
 
     # 出来高の過去5日分（または5週分）の移動平均を追加
     for i in range(10):
-        feature[f"{prefix}_vol_ma_5_t-{i}"] = (
-            data["Volume"].shift(i).rolling(window=5).mean()
-        )
+        feature[f"{prefix}_vol_ma_5_t-{i}"] = data["Volume"].shift(i).rolling(window=5).mean()
+
+    # print("Calculated volume features:")
+    # print(feature.head())
 
     return feature
