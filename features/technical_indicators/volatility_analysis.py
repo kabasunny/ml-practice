@@ -1,6 +1,5 @@
 import pandas as pd
 
-
 def calculate_volatility_features(prices):
     """
     10個前のデータを基準に、9個前が何パーセント(小数第一位)変化したか
@@ -14,6 +13,8 @@ def calculate_volatility_features(prices):
     ...
     5個前のデータを基準に、1個前が何パーセント(小数第一位)変化したか
     5個前のデータを基準に、現在が何パーセント(小数第一位)変化したか
+
+    過去5個の平均と当日の値の差割合を過去10日分
 
     Args:
         prices (pandas.Series): 価格データを含むシリーズ
@@ -37,6 +38,13 @@ def calculate_volatility_features(prices):
         for i in range(4, -1, -1):
             feature[f"per_chg_fm_5_{i}"] = (
                 (prices.shift(i) - base_price_5) / base_price_5 * 100
+            ).round(1)
+
+    # 追加 過去5個の平均と当日の値の差割合を過去10日分
+    if data_length >= 10:
+        for i in range(9, -1, -1):
+            feature[f"per_5ma_10_{i}"] = (
+                (prices.shift(i) - prices.shift(i).rolling(window=5).mean()) / prices.shift(i).rolling(window=5).mean() * 100
             ).round(1)
 
     return feature

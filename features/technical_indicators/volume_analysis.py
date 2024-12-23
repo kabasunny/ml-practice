@@ -17,8 +17,10 @@ def calculate_volume_features(valumes):
     for i in range(min(10, data_length)):
         feature[f"vol_t-{i}"] = valumes.shift(i)
 
+    
+    # いらなそう
     # 出来高の過去5日分（または5週分）の移動平均を追加
-    for i in range(min(10, data_length)):
-        feature[f"vol_5ma_t-{i}"] = valumes.shift(i).rolling(window=5).mean()
+    # for i in range(min(10, data_length)):
+    #     feature[f"vol_5ma_t-{i}"] = valumes.shift(i).rolling(window=5).mean()
 
     return feature

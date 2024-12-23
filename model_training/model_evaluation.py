@@ -45,7 +45,7 @@ def model_predict(
         symbol_signals[symbol] = results_df[
             (results_df["Symbol"] == symbol) & (results_df["Predicted"] == 1)
         ].index
-        plot_results(daily_data, features_df, results_df, symbol)  # 目視で確認、重要！
+        # plot_results(daily_data, features_df, results_df, symbol)  # 目視で確認、重要！
 
     return symbol_signals  # シンボルごとの予測結果を返す
 
