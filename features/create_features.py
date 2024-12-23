@@ -102,14 +102,14 @@ def create_features(daily_data, trade_start_date, labeled_data, data_numbers):
     # ラベルを追加（評価用データ）
     features_df_for_ev["Label"] = labeled_data["Label"].loc[feature_dates_ev]
 
-    # 不正解ラベルのデータ数と正解ラベルのデータ数を表示
-    label_counts_tr = features_df_for_tr["Label"].value_counts()
-    print(f"tr1不正解ラベル数: {label_counts_tr[0]}")
-    print(f"tr1正解ラベル数  : {label_counts_tr[1]}")
+    # # 不正解ラベルのデータ数と正解ラベルのデータ数を表示
+    # label_counts_tr = features_df_for_tr["Label"].value_counts()
+    # print(f"tr1不正解ラベル数: {label_counts_tr[0]}")
+    # print(f"tr1正解ラベル数  : {label_counts_tr[1]}")
 
-    # 不正解ラベルのデータ数と正解ラベルのデータ数を表示
-    label_counts_ev = features_df_for_ev["Label"].value_counts()
-    print(f"ev1不正解ラベル数: {label_counts_ev[0]}")
-    print(f"ev1正解ラベル数  : {label_counts_ev[1]}")
+    # # 不正解ラベルのデータ数と正解ラベルのデータ数を表示
+    # label_counts_ev = features_df_for_ev["Label"].value_counts()
+    # print(f"ev1不正解ラベル数: {label_counts_ev[0]}")
+    # print(f"ev1正解ラベル数  : {label_counts_ev[1]}")
 
     return features_df_for_tr, features_df_for_ev
