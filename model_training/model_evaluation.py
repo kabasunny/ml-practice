@@ -2,10 +2,13 @@ import pandas as pd
 from model_training.plot_buy_chart import plot_results
 from sklearn.metrics import confusion_matrix
 
-def model_predict(gbm, training_features_df, all_features_df, symbol_data_dict):
+
+def model_predict(
+    gbm, model_predict_features_df, features_df_for_evaluation, symbol_data_dict
+):
     # モデルの予測と結果の確認
-    X_test = training_features_df.drop("Label", axis=1)
-    y_test = training_features_df["Label"]
+    X_test = model_predict_features_df.drop("Label", axis=1)  # 説明変数
+    y_test = model_predict_features_df["Label"]  # 目的変数
     y_pred = gbm.predict(X_test, num_iteration=gbm.best_iteration)
     y_pred_binary = (y_pred > 0.5).astype(int)
 
@@ -14,9 +17,9 @@ def model_predict(gbm, training_features_df, all_features_df, symbol_data_dict):
         {
             "Actual": y_test,
             "Predicted": y_pred_binary,
-            "Symbol": all_features_df["Symbol"],
+            "Symbol": features_df_for_evaluation["Symbol"],
         },
-        index=training_features_df.index,
+        index=model_predict_features_df.index,
     )
 
     # カスタムの評価を呼び出す
@@ -36,13 +39,24 @@ def model_predict(gbm, training_features_df, all_features_df, symbol_data_dict):
     # 各シンボルごとの予測結果を抽出して辞書に格納
     for symbol in symbol_data_dict.keys():
         daily_data = symbol_data_dict[symbol]
-        features_df = all_features_df[all_features_df["Symbol"] == symbol]
+        features_df = features_df_for_evaluation[
+            features_df_for_evaluation["Symbol"] == symbol
+        ]
         symbol_signals[symbol] = results_df[
             (results_df["Symbol"] == symbol) & (results_df["Predicted"] == 1)
         ].index
-        # plot_results(daily_data, features_df, results_df, symbol) # 目視で用、重要！
+        plot_results(daily_data, features_df, results_df, symbol)  # 目視で確認、重要！
 
     return symbol_signals  # シンボルごとの予測結果を返す
+
+
+# 戻り値の例
+# {
+#     'AAPL': Index(['2023-01-01', '2023-01-05', '2023-01-10'], dtype='datetime64[ns]'),
+#     'GOOGL': Index(['2023-02-01', '2023-02-05'], dtype='datetime64[ns]'),
+#     // 他のシンボル...
+# }
+
 
 def custom_metrics(y_test, y_pred_binary):
     # Recallのデバッグ
