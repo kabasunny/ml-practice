@@ -6,17 +6,15 @@ from features.process_technical_features import process_technical_features
 
 
 def create_features_for_dates(
-    dates_for_labels, daily_prices, weekly_prices, monthly_prices, remove_trend
+    dates_for_labels, daily_datas, weekly_datas, monthly_datas, remove_trend
 ):
     features = []
     feature_dates = []
+    detrended_daily_prices = detrend_prices(daily_datas, remove_trend)
+    detrended_weekly_prices = detrend_prices(weekly_datas, remove_trend)
+    detrended_monthly_prices = detrend_prices(monthly_datas, remove_trend)
 
     for date in dates_for_labels:
-
-        # daily_prices を処理して detrended_daily_prices, detrended_weekly_prices, detrended_monthly_prices を作成
-        detrended_daily_prices = detrend_prices(daily_prices, remove_trend)
-        detrended_weekly_prices = detrend_prices(weekly_prices, remove_trend)
-        detrended_monthly_prices = detrend_prices(monthly_prices, remove_trend)
 
         # 最近の価格データを取得
         recent_detrended_prices = {
@@ -26,20 +24,20 @@ def create_features_for_dates(
         }
 
         feature = {}
-        for freq, prices in recent_detrended_prices.items():
+        for freq, prides in recent_detrended_prices.items():
             prefix = freq
-            feature.update(process_frequency_features(prices, prefix))
+            feature.update(process_frequency_features(prides, prefix))
 
-        # 最近の価格データを取得
-        recent_prices = {
-            "d": daily_prices.loc[:date],
-            # "w": weekly_prices.loc[:date], # 週足のデータを入れようとするとエラーになる
+        # 最近の出来高データを取得  # 過去10個分さかのぼり、そこから5個分の移動平均を算出
+        recent_datas = {
+            "d": daily_datas.loc[:date].tail(15),
+            "w": weekly_datas.loc[:date].tail(15),
         }
 
         # 出来高特徴量の計算
-        for freq, prices in recent_prices.items():
+        for freq, datas in recent_datas.items():
             prefix = freq
-            feature.update(process_technical_features(prices, prefix, date))
+            feature.update(process_technical_features(datas, prefix))
 
         features.append(feature)
         feature_dates.append(date)
