@@ -3,7 +3,7 @@ from features.cycle_theory.fourier.fft_analysis import fft_analysis
 from features.cycle_theory.peak_trough.detect_cycles import detect_cycles
 
 
-def process_frequency_features(prices, prefix):
+def process_cycle_features(prices, prefix):
     feature = {}
     if len(prices) > 0:
         # サイクル検出

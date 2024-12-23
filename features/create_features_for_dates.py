@@ -1,8 +1,8 @@
-import numpy as np
-import pandas as pd
 from data_processing.detrend_prices import detrend_prices
-from features.process_frequency_features import process_frequency_features
-from features.process_technical_features import process_technical_features
+from features.cycle_theory.process_cycle_features import process_cycle_features
+from features.technical_indicators.process_technical_features import (
+    process_technical_features,
+)
 
 
 def create_features_for_dates(
@@ -26,9 +26,9 @@ def create_features_for_dates(
         feature = {}
         for freq, prides in recent_detrended_prices.items():
             prefix = freq
-            feature.update(process_frequency_features(prides, prefix))
+            feature.update(process_cycle_features(prides, prefix))
 
-        # 最近の出来高データを取得  # 過去10個分さかのぼり、そこから5個分の移動平均を算出
+        # 最近のデータを取得  価格・出来高は過去10個分さかのぼる、出来高はそこから5個分の移動平均を算出
         recent_datas = {
             "d": daily_datas.loc[:date].tail(15),
             "w": weekly_datas.loc[:date].tail(15),
