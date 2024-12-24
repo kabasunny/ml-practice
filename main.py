@@ -43,42 +43,42 @@ def main():
     )
 
 
-    # # --------------------------以下は将来、別のプロジェクトにて、Goに移管したい
-    # # --------------------------銘柄毎の最適パラメータ抽出
-    # start_time_optimize = time.time()
-    # symbol_signals, optimal_params, least_optimal_params, rejected_params = (
-    #     optimize_parameters_for_symbols(symbol_signals, symbol_data_dict)
-    # )
-    # end_time_optimize = time.time()
-    # print(
-    #     f"銘柄毎の最適パラメータ抽出の処理時間: {end_time_optimize - start_time_optimize:.2f}秒"
-    # )
+    # --------------------------以下は将来、別のプロジェクトにて、Goに移管したい
+    # --------------------------銘柄毎の最適パラメータ抽出
+    start_time_optimize = time.time()
+    symbol_signals, optimal_params, least_optimal_params, rejected_params = (
+        optimize_parameters_for_symbols(symbol_signals, symbol_data_dict)
+    )
+    end_time_optimize = time.time()
+    print(
+        f"銘柄毎の最適パラメータ抽出の処理時間: {end_time_optimize - start_time_optimize:.2f}秒"
+    )
 
-    # # --------------------------セクター全体の最適パラメータ探索
-    # start_time_best = time.time()
-    # best_params, max_profit_loss, param_results = find_best_params(
-    #     optimal_params, symbol_data_dict, symbol_signals, trading_strategy
-    # )
-    # display_params(best_params, max_profit_loss, param_results, "良い : 最適な群で")
-    # end_time_best = time.time()
-    # print(
-    #     f"セクター全体(銘柄数:{len(symbol_signals)})の最適パラメータ探索の処理時間: {end_time_best - start_time_best:.2f}秒"
-    # )
+    # --------------------------セクター全体の最適パラメータ探索
+    start_time_best = time.time()
+    best_params, max_profit_loss, param_results = find_best_params(
+        optimal_params, symbol_data_dict, symbol_signals, trading_strategy
+    )
+    display_params(best_params, max_profit_loss, param_results, "良い : 最適な群で")
+    end_time_best = time.time()
+    print(
+        f"セクター全体(銘柄数:{len(symbol_signals)})の最適パラメータ探索の処理時間: {end_time_best - start_time_best:.2f}秒"
+    )
 
-    # start_time_least_optimal = time.time()
-    # least_optimal_params_best, min_profit_loss, least_param_results = find_worst_params(
-    #     least_optimal_params, symbol_data_dict, symbol_signals, trading_strategy
-    # )
-    # display_params(
-    #     least_optimal_params_best,
-    #     min_profit_loss,
-    #     least_param_results,
-    #     "悪い : 最適から遠い群で",
-    # )
-    # end_time_least_optimal = time.time()
-    # print(
-    #     f"最適でないパラメータ探索の処理時間: {end_time_least_optimal - start_time_least_optimal:.2f}秒"
-    # )
+    start_time_least_optimal = time.time()
+    least_optimal_params_best, min_profit_loss, least_param_results = find_worst_params(
+        least_optimal_params, symbol_data_dict, symbol_signals, trading_strategy
+    )
+    display_params(
+        least_optimal_params_best,
+        min_profit_loss,
+        least_param_results,
+        "悪い : 最適から遠い群で",
+    )
+    end_time_least_optimal = time.time()
+    print(
+        f"最適でないパラメータ探索の処理時間: {end_time_least_optimal - start_time_least_optimal:.2f}秒"
+    )
 
 
 if __name__ == "__main__":
