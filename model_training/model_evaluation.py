@@ -50,7 +50,7 @@ def model_predict(
     return symbol_signals  # シンボルごとの予測結果を返す
 
 
-# 戻り値の例
+# symbol_signalsの例
 # {
 #     'AAPL': Index(['2023-01-01', '2023-01-05', '2023-01-10'], dtype='datetime64[ns]'),
 #     'GOOGL': Index(['2023-02-01', '2023-02-05'], dtype='datetime64[ns]'),
