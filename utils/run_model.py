@@ -50,19 +50,6 @@ def run_model(
         symbol_data_dict,
     )
 
-    # 途中結果を表示
-    print(f"モデル {model_type} による予測結果:")
-    print(f"True Positives  (TP) : {tp}")
-    print(f"True Negatives  (TN) : {tn}")
-    print(f"False Positives (FP) : {fp}")
-    print(f"False Negatives (FN) : {fn}")
-    print(f"Total Tests     (TT) : {total_tests}")
-    print(f"Accuracy [(TP + TN) / TT]  : {accuracy:.4f}")
-    print(f"Precision [TP / (TP + FP)] : {precision:.4f}")
-    print(f"Recall [TP / (TP + FN)]    : {recall:.4f}")
-    print(f"Not-Recall [TN / (TN + FP)]: {not_recall:.4f}")
-    print(f"F1 Score [2 * (Precision * Recall) / (Precision + Recall)]: {f1_score:.4f}")
-
     # 結果を保存
     results[model_type] = {
         "TP": tp,

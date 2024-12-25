@@ -39,14 +39,14 @@ def main():
 
     model_types = [
         "lightgbm",
-        "random_forest",
+        "rand_frst",
         "xgboost",
         "catboost",
         "adaboost",
-        "gradient_boosting",
+        "grdt_bstg",
         "svm",
         "knn",
-        "logistic_regression",
+        "logc_regr",
     ]
 
     # 結果を保存するための辞書を定義
@@ -65,10 +65,32 @@ def main():
             results,
         )
 
+    # データフレームを作成（転置しない）
     results_df = pd.DataFrame(results).T
-    results_df = results_df.transpose()  # 縦横を入れ替え
+
+    # 小数点以下第三位まで表示する列と整数で表示する列を分ける
+    float_columns = ["Accuracy", "Precision", "Recall", "Not-Recall", "F1 Score"]
+    int_columns = ["TP", "TN", "FP", "FN", "Total Tests"]
+
+    # 存在する列のみをフォーマット（データ型を適用）
+    for col in float_columns:
+        if col in results_df.columns:
+            results_df[col] = results_df[col].astype(float)
+    for col in int_columns:
+        if col in results_df.columns:
+            results_df[col] = results_df[col].astype(int)
+
+    # フォーマッタを定義
+    formatters = {}
+    for col in float_columns:
+        if col in results_df.columns:
+            formatters[col] = '{:.3f}'.format
+    for col in int_columns:
+        if col in results_df.columns:
+            formatters[col] = '{:d}'.format
+
     print("\n最終結果:")
-    print(results_df)
+    print(results_df.to_string(formatters=formatters))
 
 
 if __name__ == "__main__":

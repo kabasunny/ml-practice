@@ -140,7 +140,7 @@ def train_logistic_regression(X_train, y_train):
 def train_model(model_type, X_train, X_test, y_train, y_test):
     if model_type == "lightgbm":
         return train_lightgbm(X_train, X_test, y_train, y_test)
-    elif model_type == "random_forest":
+    elif model_type == "rand_frst":
         return train_random_forest(X_train, y_train)
     elif model_type == "xgboost":
         return train_xgboost(X_train, y_train)
@@ -148,13 +148,13 @@ def train_model(model_type, X_train, X_test, y_train, y_test):
         return train_catboost(X_train, y_train)
     elif model_type == "adaboost":
         return train_adaboost(X_train, y_train)
-    elif model_type == "gradient_boosting":
+    elif model_type == "grdt_bstg":
         return train_gradient_boosting(X_train, y_train)
     elif model_type == "svm":
         return train_svm(X_train, y_train)
     elif model_type == "knn":
         return train_knn(X_train, y_train)
-    elif model_type == "logistic_regression":
+    elif model_type == "logc_regr":
         return train_logistic_regression(X_train, y_train)
     else:
         raise ValueError(f"Unsupported model type: {model_type}")
