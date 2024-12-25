@@ -6,3 +6,5 @@ __pycache__/
 best_params.csv
 
 optimization_results.csv
+
+catboost_info/

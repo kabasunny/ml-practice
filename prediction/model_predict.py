@@ -33,13 +33,6 @@ def model_predict(
         y_test, y_pred_binary
     )
 
-    print(f"Accuracy [(TP + TN) / TT]  : {accuracy:.4f}")
-    print(f"Precision [TP / (TP + FP)] : {precision:.4f}")
-    print(f"Recall [TP / (TP + FN)]    : {recall:.4f}")
-    print(f"Not-Recall [TN / (TN + FP)]: {not_recall:.4f}")
-    print(f"F1 Score [2 * (Precision * Recall) / (Precision + Recall)]: {f1_score:.4f}")
-    print(f"NPV [TN / (TN + FN)]       : {npv:.4f}")
-
     symbol_signals = {}  # シンボルごとの予測結果を格納する辞書
 
     # 各シンボルごとの予測結果を抽出して辞書に格納

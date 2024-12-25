@@ -2,9 +2,7 @@ import pandas as pd
 import time
 from utils.fetch_and_prepare_data import fetch_and_prepare_data
 from model_training.data_preparation import prepare_data
-from utils.run_model import run_model  # run_model 関数をインポート
-from model_io.save_model import save_model
-from model_io.load_model import load_model
+from utils.run_model import run_model
 
 # Pandasの表示オプションを設定
 pd.set_option("display.max_rows", None)
@@ -70,7 +68,7 @@ def main():
 
     # 小数点以下第三位まで表示する列と整数で表示する列を分ける
     float_columns = ["Accuracy", "Precision", "Recall", "Not-Recall", "F1 Score"]
-    int_columns = ["TP", "TN", "FP", "FN", "Total Tests"]
+    int_columns = ["TP", "TN", "FP", "FN", "T-Tests"]
 
     # 存在する列のみをフォーマット（データ型を適用）
     for col in float_columns:
@@ -84,10 +82,10 @@ def main():
     formatters = {}
     for col in float_columns:
         if col in results_df.columns:
-            formatters[col] = '{:.3f}'.format
+            formatters[col] = "{:.3f}".format
     for col in int_columns:
         if col in results_df.columns:
-            formatters[col] = '{:d}'.format
+            formatters[col] = "{:d}".format
 
     print("\n最終結果:")
     print(results_df.to_string(formatters=formatters))

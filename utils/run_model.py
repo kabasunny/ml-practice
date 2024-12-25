@@ -56,7 +56,7 @@ def run_model(
         "TN": tn,
         "FP": fp,
         "FN": fn,
-        "Total Tests": total_tests,
+        "T―Tests": total_tests,
         "Accuracy": accuracy,
         "Precision": precision,
         "Recall": recall,
