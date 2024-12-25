@@ -30,8 +30,8 @@ def create_features_for_dates(
 
         # 最近のデータを取得  価格・出来高は過去10個分さかのぼる、出来高はそこから5個分の移動平均を算出
         recent_datas = {
-            "d": daily_datas.loc[:date].tail(15),
-            "w": weekly_datas.loc[:date].tail(15),
+            "d": daily_datas.loc[:date].tail(20),
+            "w": weekly_datas.loc[:date].tail(20),
         }
 
         # 出来高特徴量の計算

@@ -6,7 +6,6 @@ from scipy.stats import mode
 # トラフ（谷）検出関数 この出力を正解ラベルに設定する
 def detect_troughs(prices):  # pandas.Series を取る
     # 終値のデータから谷（安値）を検出
-    print(prices)
     troughs, _ = find_peaks(-prices)
 
     # 谷間の間隔を計算

@@ -1,6 +1,7 @@
 # cycle_theory\fourier\fft_analysis.py
 import numpy as np
 
+
 # フーリエ変換を用いたサイクル解析関数
 def fft_analysis(prices):
     n = len(prices)  # 終値データの長さを取得
@@ -26,20 +27,20 @@ def fft_analysis(prices):
 
     # データ数と一致する周期を除外
     if len(fft_amplitude) > 1:
-        match_idx = np.where(fft_period == n)[0]  # データ数と一致する周期のインデックスを取得
+        match_idx = np.where(fft_period == n)[
+            0
+        ]  # データ数と一致する周期のインデックスを取得
         if len(match_idx) > 0:
             excluded_value = fft_period[match_idx[0]]  # 除外する周期の値を取得
             fft_amplitude = np.delete(
                 fft_amplitude, match_idx[0]
             )  # 振幅スペクトルから除去
-            fft_period = np.delete(
-                fft_period, match_idx[0]
-            )  # 周期リストから除去
+            fft_period = np.delete(fft_period, match_idx[0])  # 周期リストから除去
             # print(f"excluded_fft_period : {excluded_value}")  # 除外した値をアナウンス
     # print(f"4, fft_amplitude: {fft_amplitude}")
 
     dominant_periods = fft_period[
-        np.argsort(-fft_amplitude)[:10]
+        np.argsort(-fft_amplitude)[:5]
     ]  # 上位10の支配的な周期を取得
 
     return fft_period, fft_amplitude, dominant_periods  # 計算結果を返す
