@@ -12,6 +12,7 @@ from utils.optimize_parameters_for_symbols import optimize_parameters_for_symbol
 
 def main():
     sector_number = 3
+    sector_number = 3
     trade_start_date = pd.Timestamp("2005-08-01")
     before_period_days = 366 * 3
     end_date = pd.Timestamp("today")
@@ -42,17 +43,17 @@ def main():
         gbm, model_predict_features_df, features_df_for_evaluation, symbol_data_dict
     )
 
+    # # --------------------------以下は将来、別のプロジェクトにて、Goに移管したい
+    # # --------------------------銘柄毎の最適パラメータ抽出
+    # start_time_optimize = time.time()
+    # symbol_signals, optimal_params, least_optimal_params, rejected_params = (
+    #     optimize_parameters_for_symbols(symbol_signals, symbol_data_dict)
+    # )
+    # end_time_optimize = time.time()
+    # print(
+    #     f"銘柄毎の最適パラメータ抽出の処理時間: {end_time_optimize - start_time_optimize:.2f}秒"
+    # )
 
-#     # --------------------------以下は将来、別のプロジェクトにて、Goに移管したい
-#     # --------------------------銘柄毎の最適パラメータ抽出
-#     start_time_optimize = time.time()
-#     symbol_signals, optimal_params, least_optimal_params, rejected_params = (
-#         optimize_parameters_for_symbols(symbol_signals, symbol_data_dict)
-#     )
-#     end_time_optimize = time.time()
-#     print(
-#         f"銘柄毎の最適パラメータ抽出の処理時間: {end_time_optimize - start_time_optimize:.2f}秒"
-#     )
 
 #     # --------------------------セクター全体の最適パラメータ探索
 #     start_time_best = time.time()
