@@ -1,5 +1,6 @@
 import pandas as pd
 from prediction.evaluate_prediction import evaluate_metrics
+import numpy as np
 
 
 def model_predict(
@@ -51,4 +52,24 @@ def model_predict(
             (results_df["Symbol"] == symbol) & (results_df["Predicted"] == 1)
         ].index
 
-    return symbol_signals  # シンボルごとの予測結果を返す
+    # 評価指標を追加して返す
+    tp = np.sum((y_pred_binary == 1) & (y_test == 1))
+    tn = np.sum((y_pred_binary == 0) & (y_test == 0))
+    fp = np.sum((y_pred_binary == 1) & (y_test == 0))
+    fn = np.sum((y_pred_binary == 0) & (y_test == 1))
+    total_tests = len(y_test)
+
+    return (
+        symbol_signals,
+        tp,
+        tn,
+        fp,
+        fn,
+        total_tests,
+        accuracy,
+        precision,
+        recall,
+        not_recall,
+        f1_score,
+        npv,
+    )

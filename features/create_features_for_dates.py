@@ -24,20 +24,20 @@ def create_features_for_dates(
         }
 
         feature = {}
-        for freq, prides in recent_detrended_prices.items():
+        for freq, prices in recent_detrended_prices.items():
             prefix = freq
-            feature.update(process_cycle_features(prides, prefix))
+            feature.update(process_cycle_features(prices, prefix))
 
-        # 最近のデータを取得  価格・出来高は過去10個分さかのぼる、出来高はそこから5個分の移動平均を算出
-        recent_datas = {
-            "d": daily_datas.loc[:date].tail(20),
-            "w": weekly_datas.loc[:date].tail(20),
-        }
+        # # 最近のデータを取得  価格・出来高は過去10個分さかのぼる、出来高はそこから5個分の移動平均を算出
+        # recent_datas = {
+        #     "d": daily_datas.loc[:date].tail(20),
+        #     "w": weekly_datas.loc[:date].tail(20),
+        # }
 
-        # 出来高特徴量の計算
-        for freq, datas in recent_datas.items():
-            prefix = freq
-            feature.update(process_technical_features(datas, prefix))
+        # # 出来高特徴量の計算
+        # for freq, datas in recent_datas.items():
+        #     prefix = freq
+        #     feature.update(process_technical_features(datas, prefix))
 
         features.append(feature)
         feature_dates.append(date)
