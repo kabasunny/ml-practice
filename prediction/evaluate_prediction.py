@@ -3,7 +3,7 @@ from sklearn.metrics import confusion_matrix
 
 def evaluate_metrics(y_test, y_pred_binary):
 
-    print("トレーニング済みモデルのより実践条件での評価結果:")
+    print("<----------------実践条件での評価結果----------------->")
 
     cm = confusion_matrix(y_test, y_pred_binary)
     TN, FP, FN, TP = cm.ravel()

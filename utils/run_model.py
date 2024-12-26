@@ -50,18 +50,21 @@ def run_model(
         symbol_data_dict,
     )
 
-    # 結果を保存
-    results[model_type] = {
-        "TP": tp,
-        "TN": tn,
-        "FP": fp,
-        "FN": fn,
-        "T―Tests": total_tests,
-        "Accuracy": accuracy,
-        "Precision": precision,
-        "Recall": recall,
-        "Not-Recall": not_recall,
-        "F1 Score": f1_score,
+    # 結果をフォーマット
+    formatted_results = {
+        "TP": int(tp),
+        "TN": int(tn),
+        "FP": int(fp),
+        "FN": int(fn),
+        "T_Tests": int(total_tests),
+        "Accuracy": f"{accuracy:.3f}",
+        "Precision": f"{precision:.3f}",
+        "Recall": f"{recall:.3f}",
+        "Not-Recall": f"{not_recall:.3f}",
+        "F1 Score": f"{f1_score:.3f}",
     }
+
+    # 結果を保存
+    results[model_type] = formatted_results
 
     print(f"モデル {model_type} による予測完了")

@@ -4,11 +4,11 @@ from utils.fetch_and_prepare_data import fetch_and_prepare_data
 from model_training.data_preparation import prepare_data
 from utils.run_model import run_model
 
-# Pandasの表示オプションを設定
-pd.set_option("display.max_rows", None)
-pd.set_option("display.max_columns", None)
-pd.set_option("display.max_colwidth", None)
-pd.set_option("display.width", None)
+# Pandasの表示オプションを設定 Noneで全て表示
+pd.set_option("display.max_rows", None)  # 表示する最大行数
+pd.set_option("display.max_columns", None)  # 表示する最大列数
+pd.set_option("display.max_colwidth", 7)  # 各列の幅（文字数）
+pd.set_option("display.width", None)  # 表示幅
 
 
 def main():
@@ -66,29 +66,8 @@ def main():
     # データフレームを作成（転置しない）
     results_df = pd.DataFrame(results).T
 
-    # 小数点以下第三位まで表示する列と整数で表示する列を分ける
-    float_columns = ["Accuracy", "Precision", "Recall", "Not-Recall", "F1 Score"]
-    int_columns = ["TP", "TN", "FP", "FN", "T-Tests"]
-
-    # 存在する列のみをフォーマット（データ型を適用）
-    for col in float_columns:
-        if col in results_df.columns:
-            results_df[col] = results_df[col].astype(float)
-    for col in int_columns:
-        if col in results_df.columns:
-            results_df[col] = results_df[col].astype(int)
-
-    # フォーマッタを定義
-    formatters = {}
-    for col in float_columns:
-        if col in results_df.columns:
-            formatters[col] = "{:.3f}".format
-    for col in int_columns:
-        if col in results_df.columns:
-            formatters[col] = "{:d}".format
-
-    print("\n最終結果:")
-    print(results_df.to_string(formatters=formatters))
+    print("最終*･゜ﾟ･*:.｡..｡.:*･゜(n‘∀‘)ηﾟ･*:.｡. .｡.:*･゜ﾟ･*結果:")
+    print(results_df)
 
 
 if __name__ == "__main__":
