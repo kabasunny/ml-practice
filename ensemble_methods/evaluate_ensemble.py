@@ -25,19 +25,21 @@ def evaluate_ensemble(all_symbol_signals, model_predict_features_df):
 
         # 現在のモデルの組み合わせに基づいて重複する値を抽出
         selected_signals = {model: all_symbol_signals[model] for model in combination}
-        
-        min_overlap_count = 2  # 重複する日付の最小回数
-        duplicated_values = extract_duplicate_values(selected_signals, min_overlap_count)
-        
+
+        min_overlap_count = 7  # 重複する日付の最小回数
+        duplicated_values = extract_duplicate_values(
+            selected_signals, min_overlap_count
+        )
 
         # テストデータのインデックスを取得
         test_indices = model_predict_features_df.index
         y_test = model_predict_features_df["Label"]
-        print(f"len(y_test) : {len(y_test)}")
+        symbols = list(duplicated_values.keys())
 
         # 重複する日付をy_pred_binaryへ変換
-        y_pred_binary = convert_to_binary_predictions(duplicated_values, test_indices)
-        print(f"len(y_pred_binary) : {len(y_pred_binary)}")
+        y_pred_binary = convert_to_binary_predictions(
+            duplicated_values, test_indices, symbols
+        )
 
         # 評価指標を計算
         evaluate_metrics(y_test, y_pred_binary)

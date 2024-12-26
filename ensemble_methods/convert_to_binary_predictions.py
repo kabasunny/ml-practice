@@ -1,25 +1,26 @@
-def convert_to_binary_predictions(duplicated_values, test_indices):
+import pandas as pd
+
+
+def convert_to_binary_predictions(duplicated_values, test_indices, symbols):
     """
     重複する日付をバイナリ予測に変換する関数
     :param duplicated_values: 重複する日付の辞書
     :param test_indices: テストデータのインデックス
+    :param symbols: シンボルのリスト
     :return: バイナリ予測
     """
-    y_pred_binary = [0] * len(test_indices)
+    # y_pred_binary を test_indices と同じ長さで初期化し、すべての要素を 0 に設定
+    y_pred_binary = pd.Series([0] * len(test_indices), index=test_indices)
 
-    all_duplicated_dates = set()
-
-    # 重複した日付を一つのセットに集約
-    for dates in duplicated_values.values():
-        all_duplicated_dates.update(dates)
-
-    # 重複日付をバイナリ予測に反映
-    for date in all_duplicated_dates:
-        # print(f"date : {date}")
-        if date in test_indices:
-            # print("date in test_indices")
-            index = test_indices.get_loc(date)
-            if isinstance(index, int):
-                y_pred_binary[index] = 1
+    # 各シンボルについて処理を行う
+    for symbol in symbols:
+        # シンボルが duplicated_values に存在する場合
+        if symbol in duplicated_values:
+            # シンボルに対応する重複日付ごとに処理を行う
+            for date in duplicated_values[symbol]:
+                # 重複日付が test_indices に存在する場合
+                if date in test_indices:
+                    # 重複日付のインデックスを 1 に設定
+                    y_pred_binary.loc[date] = 1
 
     return y_pred_binary
