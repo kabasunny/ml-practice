@@ -15,7 +15,11 @@ def convert_to_binary_predictions(duplicated_values, test_indices):
 
     # 重複日付をバイナリ予測に反映
     for date in all_duplicated_dates:
+        # print(f"date : {date}")
         if date in test_indices:
-            y_pred_binary[test_indices.get_loc(date)] = 1
+            # print("date in test_indices")
+            index = test_indices.get_loc(date)
+            if isinstance(index, int):
+                y_pred_binary[index] = 1
 
     return y_pred_binary

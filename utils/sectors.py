@@ -37,12 +37,12 @@ def get_automotive_symbols():
         "7261.T",  # Mazda Motor Corporation
         "7269.T",  # Suzuki Motor Corporation
         # "7262.T",  # Mitsubishi Motors Corporation 上場廃止
-        "7270.T",  # Subaru Corporation
-        "7202.T",  # Isuzu Motors Limited
-        "7205.T",  # Hino Motors, Ltd.
-        "7211.T",  # Mitsubishi Fuso Truck and Bus Corporation
-        "7224.T",  # Shizuoka Daihatsu Motor Co., Ltd.
-        "7266.T",  # Showa Corporation
+        # "7270.T",  # Subaru Corporation
+        # "7202.T",  # Isuzu Motors Limited
+        # "7205.T",  # Hino Motors, Ltd.
+        # "7211.T",  # Mitsubishi Fuso Truck and Bus Corporation
+        # "7224.T",  # Shizuoka Daihatsu Motor Co., Ltd.
+        # "7266.T",  # Showa Corporation
     ]
 
 
@@ -67,7 +67,7 @@ def get_technology_symbols():
 def get_financial_symbols():
     return [
         "8306.T",  # Mitsubishi UFJ Financial Group, Inc.
-        # "8316.T",  # Sumitomo Mitsui Financial Group, Inc.
+        "8316.T",  # Sumitomo Mitsui Financial Group, Inc.
         # "8411.T",  # Mizuho Financial Group, Inc.
         # "8604.T",  # Nomura Holdings, Inc.
         # "8628.T"   # Matsui Securities Co., Ltd.
