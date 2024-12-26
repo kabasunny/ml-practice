@@ -1,31 +1,31 @@
 syntax = "proto3";
 
 // サービスの定義
-service StockService {
-  rpc GetStockData (StockRequest) returns (StockResponse);
+service MLStockService {
+  rpc GetMLStockData (MLStockRequest) returns (MLStockResponse);
 }
 
 // リクエストメッセージの定義
-message StockRequest {
+message MLStockRequest {
   repeated string symbols = 1;
   string start_date = 2;
   string end_date = 3;
 }
 
 // レスポンスメッセージの定義
-message StockResponse {
-  repeated SymbolData symbol_data = 1;  // シンボルごとのデータリスト
+message MLStockResponse {
+  repeated MLSymbolData symbol_data = 1;  // シンボルごとのデータリスト
 }
 
 // シンボルごとのデータとシグナルを格納するメッセージの定義
-message SymbolData {
+message MLSymbolData {
   string symbol = 1;  // シンボル名
-  repeated DailyData daily_data = 2;  // 日足データリスト
+  repeated MLDailyData daily_data = 2;  // 日足データリスト
   repeated string signals = 3;  // 予測結果の日付リスト
 }
 
 // 日足データの定義
-message DailyData {
+message MLDailyData {
   string date = 1;
   float open = 2;
   float high = 3;
@@ -34,4 +34,3 @@ message DailyData {
   float adj_close = 6;
   int64 volume = 7;
 }
-

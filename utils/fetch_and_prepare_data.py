@@ -3,7 +3,7 @@ import time
 from data_processing.fetch_stock_data import fetch_stock_data
 from labels.create_labels import create_labels
 from features.create_features import create_features
-from sectors import get_symbols_by_sector
+from utils.sectors import get_symbols_by_sector
 
 
 def fetch_and_prepare_data(
