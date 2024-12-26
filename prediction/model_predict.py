@@ -1,5 +1,6 @@
 import pandas as pd
 from prediction.evaluate_prediction import evaluate_metrics
+from model_training.plot_buy_chart import plot_results
 import numpy as np
 
 
@@ -44,6 +45,7 @@ def model_predict(
         symbol_signals[symbol] = results_df[
             (results_df["Symbol"] == symbol) & (results_df["Predicted"] == 1)
         ].index
+        # plot_results(daily_data, features_df, results_df, symbol)  # 目視で確認、重要！
 
     # 評価指標を追加して返す
     tp = np.sum((y_pred_binary == 1) & (y_test == 1))

@@ -68,12 +68,12 @@ def run_model(
     # 結果を保存
     results[model_type] = formatted_results
 
-    print(f"★ モデル ★{model_type}★ による予測完了 ★")
+    print(f"★ モデル {model_type} による予測完了 ★")
 
     # symbol_signalsをProtoBufのレスポンスデータ構造に変換
     stock_response = convert_to_proto_response(symbol_signals, symbol_data_dict)
 
-    return stock_response
+    return stock_response, symbol_signals
 
 
 # print(f"symbol_data_dict : {symbol_data_dict}")

@@ -3,6 +3,7 @@ import time
 from utils.fetch_and_prepare_data import fetch_and_prepare_data
 from model_training.data_preparation import prepare_data
 from utils.run_model import run_model
+from ensemble_methods.evaluate_ensemble import evaluate_ensemble  # 追加
 
 # Pandasの表示オプションを設定 Noneで全て表示
 pd.set_option("display.max_rows", 20)  # 表示する最大行数
@@ -16,7 +17,7 @@ def main():
     trade_start_date = pd.Timestamp("2005-08-01")
     before_period_days = 366 * 3
     end_date = pd.Timestamp("today")
-    data_numbers = 2  # features_df生成時の正解ラベルに対する不正解ラベルの倍数制限
+    data_numbers = 3  # features_df生成時の正解ラベルに対する不正解ラベルの倍数制限
 
     # --------------------------データ取得、学習データ、特徴量、ラベルの生成
     start_time_features = time.time()
@@ -36,38 +37,43 @@ def main():
     X_train, X_test, y_train, y_test = prepare_data(training_features_df)
 
     model_types = [
-        # "lightgbm",
-        # "rand_frst",
-        # "xgboost",
-        # "catboost",
-        # "adaboost",
-        # "grdt_bstg",
-        # "svm",
+        "lightgbm",
+        "rand_frst",
+        "xgboost",
+        "catboost",
+        "adaboost",
+        "grdt_bstg",
+        "svm",
         "knn",
-        # "logc_regr",
+        "logc_regr",
     ]
 
     # 結果を保存するための辞書を定義
     results = {}
+    all_symbol_signals = {}
 
     for model_type in model_types:
-        run_model(
+        stock_response, symbol_signals = run_model(
             model_type,
             X_train,
             X_test,
             y_train,
-            y_test,
-            model_predict_features_df,
+            y_test,  # トレーニング評価用の正解ラベル
+            model_predict_features_df,  # 実践用正解ラベルはここから抽出する
             features_df_for_evaluation,
             symbol_data_dict,
             results,
         )
+        all_symbol_signals[model_type] = symbol_signals
 
     # データフレームを作成（転置しない）
     results_df = pd.DataFrame(results).T
 
-    print("*･゜ﾟ･*:.｡..｡.:*･゜最終(n-∀^)結果ηﾟ･*:.｡. .｡.:*･゜ﾟ･*")
+    print("*･゜ﾟ･*:.｡..｡.:*･゜最終(n^--^)結果ηﾟ･*:.｡. .｡.:*･゜ﾟ･*")
     print(results_df)
+
+    # アンサンブル評価を実行
+    # evaluate_ensemble(all_symbol_signals, model_predict_features_df)
 
 
 if __name__ == "__main__":
