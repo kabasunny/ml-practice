@@ -18,7 +18,9 @@ def evaluate_ensemble(all_symbol_signals, model_predict_features_df, symbol_data
 
     # モデルの組み合わせを生成
     model_types = list(all_symbol_signals.keys())
-    model_combinations = [comb for comb in combinations(model_types, 4)]
+    model_combinations = []
+    for i in range(2, len(model_types) + 1):  # 2以上のサイズを指定
+        model_combinations.extend([comb for comb in combinations(model_types, i)])
 
     for combination in model_combinations:
         # print(f"★モデルの組み合わせ★\n{combination}")
@@ -26,7 +28,11 @@ def evaluate_ensemble(all_symbol_signals, model_predict_features_df, symbol_data
         # 現在のモデルの組み合わせに基づいて重複する値を抽出
         selected_signals = {model: all_symbol_signals[model] for model in combination}
 
-        min_overlap_count = len(combination) - 1  # 重複する日付の最小回数
+        if len(combination) > 2:
+            min_overlap_count = len(combination) - 1  # 重複する日付の最小回数
+        else:
+            min_overlap_count = len(combination)
+
         duplicated_values = extract_duplicate_values(
             selected_signals, min_overlap_count
         )
