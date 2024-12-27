@@ -16,7 +16,7 @@ def main():
     trade_start_date = pd.Timestamp("2005-08-01")
     before_period_days = 366 * 3
     end_date = pd.Timestamp("today")
-    data_numbers = 2  # features_df生成時の正解ラベルに対する不正解ラベルの倍数制限
+    data_numbers = 1  # features_df生成時の正解ラベルに対する不正解ラベルの倍数制限
 
     # --------------------------データ取得、学習データ、特徴量、ラベルの生成
 

@@ -1,5 +1,7 @@
 import pandas as pd
 import time
+import json
+import os
 from data_processing.fetch_stock_data import fetch_stock_data
 from labels.create_labels import create_labels
 from features.create_features import create_features
@@ -15,6 +17,12 @@ def fetch_and_prepare_data(
     all_features_df_for_train = pd.DataFrame()
     all_features_df_for_evaluate = pd.DataFrame()
     symbol_data_dict = {}
+
+    if os.path.exists("output_data") and os.listdir("output_data"):
+        user_input = input("output_data に既存のファイルがあります。続行しますか？ (Y/N): ")
+        if user_input.lower() != 'y':
+            print("保存をスキップしました。")
+            return load_data("output_data")
 
     for symbol in symbols:
         try:
@@ -46,7 +54,46 @@ def fetch_and_prepare_data(
     print(
         f"データ取得、学習データ、特徴量、ラベルの生成 処理時間: {end_time_features - start_time_features:.2f}秒"
     )
+
+    # データを保存
+    save_data(all_features_df_for_train, all_features_df_for_evaluate, symbol_data_dict)
+
     return all_features_df_for_train, all_features_df_for_evaluate, symbol_data_dict
+
+
+def save_data(train_df, evaluate_df, symbol_dict, output_dir="output_data"):
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    train_df.to_csv(os.path.join(output_dir, "features_df_for_train.csv"), index=False)
+    evaluate_df.to_csv(os.path.join(output_dir, "features_df_for_evaluate.csv"), index=False)
+    
+    # symbol_data_dict内のDate列を文字列に変換
+    symbol_dict_serializable = {}
+    for symbol, data in symbol_dict.items():
+        data = data.reset_index()
+        if 'Date' in data.columns:
+            data['Date'] = data['Date'].astype(str)
+        symbol_dict_serializable[symbol] = data.to_dict(orient="records")
+        
+    with open(os.path.join(output_dir, "symbol_data_dict.json"), "w") as f:
+        json.dump(symbol_dict_serializable, f)
+
+def load_data(input_dir="output_data"):
+    train_df = pd.read_csv(os.path.join(input_dir, "features_df_for_train.csv"))
+    evaluate_df = pd.read_csv(os.path.join(input_dir, "features_df_for_evaluate.csv"))
+    
+    with open(os.path.join(input_dir, "symbol_data_dict.json"), "r") as f:
+        symbol_dict = {}
+        symbol_data = json.load(f)
+        for symbol, data in symbol_data.items():
+            df = pd.DataFrame(data)
+            if 'Date' in df.columns:
+                df['Date'] = pd.to_datetime(df['Date'])  # Date列をTimestamp型に変換
+                df.set_index('Date', inplace=True)
+            symbol_dict[symbol] = df
+    
+    return train_df, evaluate_df, symbol_dict
 
 
 # symbol_data_dictの例
