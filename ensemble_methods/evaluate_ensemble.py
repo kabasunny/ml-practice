@@ -2,31 +2,31 @@ from prediction.evaluate_prediction import evaluate_metrics
 from ensemble_methods.extract_duplicate_values import extract_duplicate_values
 from ensemble_methods.convert_to_binary_predictions import convert_to_binary_predictions
 from itertools import combinations
+from ensemble_methods.plot_ensemble_results import plot_ensemble_results
 
 
-def evaluate_ensemble(all_symbol_signals, model_predict_features_df):
+def evaluate_ensemble(all_symbol_signals, model_predict_features_df, symbol_data_dict):
     """
     複数のモデルの予測結果をアンサンブル評価する関数
     :param all_symbol_signals: 各モデルの予測結果を含む辞書
     :param model_predict_features_df: モデルの予測特徴データフレーム
-    :return: アンサンブル予測結果
+    :param symbol_data_dict: シンボルデータ辞書（日次データ）
+    :return: Precisionの高いベスト5の組み合わせと予測データ
     """
-    ensemble_results = {}
+    ensemble_results = []  # プロット用に、アンサンブル結果を格納するリスト
+    precision_results = []
 
     # モデルの組み合わせを生成
     model_types = list(all_symbol_signals.keys())
-    model_combinations = [comb for comb in combinations(model_types, 8)]
+    model_combinations = [comb for comb in combinations(model_types, 4)]
 
     for combination in model_combinations:
-        print(f"★モデルの組み合わせ: {combination}★")
-
-        print(f"len(all_symbol_signals) : {len(all_symbol_signals)}")
-        print(f"len(model_predict_features_df) : {len(model_predict_features_df)}")
+        # print(f"★モデルの組み合わせ★\n{combination}")
 
         # 現在のモデルの組み合わせに基づいて重複する値を抽出
         selected_signals = {model: all_symbol_signals[model] for model in combination}
 
-        min_overlap_count = 7  # 重複する日付の最小回数
+        min_overlap_count = len(combination) - 1  # 重複する日付の最小回数
         duplicated_values = extract_duplicate_values(
             selected_signals, min_overlap_count
         )
@@ -42,6 +42,69 @@ def evaluate_ensemble(all_symbol_signals, model_predict_features_df):
         )
 
         # 評価指標を計算
-        evaluate_metrics(y_test, y_pred_binary)
+        metrics = evaluate_metrics(y_test, y_pred_binary)
+        (
+            accuracy,
+            precision,
+            recall,
+            not_recall,
+            f1_score,
+            npv,
+            TP,
+            TN,
+            FP,
+            FN,
+            total_tests,
+        ) = metrics
 
-    return ensemble_results
+        # 結果を保存
+        precision_results.append((combination, metrics, duplicated_values))
+
+    # Precisionの高い順にソートしてベスト5を抽出
+    precision_results = sorted(precision_results, key=lambda x: x[1][1], reverse=True)[
+        :10
+    ]
+
+    # ベスト5のモデルの組み合わせと予測データを表示
+    for result in precision_results:
+        combination, metrics, duplicated_values = result
+        (
+            accuracy,
+            precision,
+            recall,
+            not_recall,
+            f1_score,
+            npv,
+            TP,
+            TN,
+            FP,
+            FN,
+            total_tests,
+        ) = metrics
+        print(f"モデルの組み合わせ: {combination}")
+        print(f"Precision: {precision:.4f}")
+        print(f"True Positives  (TP): {TP:.0f}")
+        print(f"True Negatives  (TN): {TN:.0f}")
+        print(f"False Positives (FP): {FP:.0f}")
+        print(f"False Negatives (FN): {FN:.0f}")
+        print(f"Total Tests     (TT): {total_tests:.0f}")
+        print(f"Accuracy [(TP + TN) / TT]: {accuracy:.4f}")
+        print(f"Precision [TP / (TP + FP)]: {precision:.4f}")
+        print(f"Recall [TP / (TP + FN)]: {recall:.4f}")
+        print(f"Not-Recall [TN / (TN + FP)]: {not_recall:.4f}")
+        print(
+            f"F1 Score [2 * (Precision * Recall) / (Precision + Recall)]: {f1_score:.4f}"
+        )
+        print(f"NPV [TN / (TN + FN)]: {npv:.4f}")
+        print("----------------------------------------------")
+
+        # プロットも行う場合
+        # for symbol in symbols:
+        #     plot_ensemble_results(
+        #         symbol_data_dict[symbol],
+        #         model_predict_features_df.loc[test_indices],
+        #         y_pred_binary.loc[test_indices],
+        #         symbol,
+        #     )
+
+    return precision_results

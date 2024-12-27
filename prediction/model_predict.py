@@ -30,9 +30,19 @@ def model_predict(
     )
 
     # カスタムの評価を呼び出す
-    accuracy, precision, recall, not_recall, f1_score, npv = evaluate_metrics(
-        y_test, y_pred_binary
-    )
+    (
+        accuracy,
+        precision,
+        recall,
+        not_recall,
+        f1_score,
+        npv,
+        _,
+        _,
+        _,
+        _,
+        _,
+    ) = evaluate_metrics(y_test, y_pred_binary)
 
     symbol_signals = {}  # シンボルごとの予測結果を格納する辞書
 

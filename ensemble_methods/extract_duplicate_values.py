@@ -2,11 +2,11 @@ import pandas as pd
 
 
 def extract_duplicate_values(selected_signals, min_overlap_count=2):
-    print(f"len(selected_signals) : {len(selected_signals)}")
+    # print(f"len(selected_signals) : {len(selected_signals)}")
 
     duplicated_values = {}
     symbols = list(selected_signals.values())[0].keys()  # 全てのシンボルを取得
-    print(f"symbols: {symbols}")
+    # print(f"symbols: {symbols}")
     for symbol in symbols:
         # 各モデルが予測した日付リストをすべて結合し、重複を確認
         all_dates = [

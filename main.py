@@ -73,7 +73,7 @@ def main():
     print(results_df)
 
     # アンサンブル評価を実行
-    evaluate_ensemble(all_symbol_signals, model_predict_features_df)
+    evaluate_ensemble(all_symbol_signals, model_predict_features_df, symbol_data_dict)
 
 
 if __name__ == "__main__":

@@ -20,9 +20,6 @@ def plot_buy_signals(daily_data, features_df, symbol):
     plt.show()
 
 
-import matplotlib.pyplot as plt
-
-
 def plot_results(daily_data, features_df, results_df, symbol):
     plt.figure(figsize=(14, 7))
     plt.plot(daily_data.index, daily_data["Close"], label="Close Price")
