@@ -9,6 +9,8 @@ from utils.sectors import get_symbols_by_sector
 def fetch_and_prepare_data(
     sector_number, trade_start_date, before_period_days, end_date, data_numbers
 ):
+    start_time_features = time.time()
+
     symbols = get_symbols_by_sector(sector_number)
     all_features_df_for_train = pd.DataFrame()
     all_features_df_for_evaluate = pd.DataFrame()
@@ -40,6 +42,10 @@ def fetch_and_prepare_data(
         except Exception as e:
             print(f"エラーが発生しました: {symbol}, {e}")
 
+    end_time_features = time.time()
+    print(
+        f"データ取得、学習データ、特徴量、ラベルの生成 処理時間: {end_time_features - start_time_features:.2f}秒"
+    )
     return all_features_df_for_train, all_features_df_for_evaluate, symbol_data_dict
 
 

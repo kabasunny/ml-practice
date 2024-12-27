@@ -1,5 +1,4 @@
 import pandas as pd
-import time
 from utils.fetch_and_prepare_data import fetch_and_prepare_data
 from model_training.data_preparation import prepare_data
 from utils.run_model import run_model
@@ -13,14 +12,14 @@ pd.set_option("display.width", None)  # 表示幅
 
 
 def main():
-    sector_number = 3
+    sector_number = "test"  # "csv" or "all", 1, 2, 3, 4, 5, "test" 数字は文字列でもOK
     trade_start_date = pd.Timestamp("2005-08-01")
     before_period_days = 366 * 3
     end_date = pd.Timestamp("today")
     data_numbers = 2  # features_df生成時の正解ラベルに対する不正解ラベルの倍数制限
 
     # --------------------------データ取得、学習データ、特徴量、ラベルの生成
-    start_time_features = time.time()
+
     features_df_for_train, features_df_for_evaluation, symbol_data_dict = (
         fetch_and_prepare_data(
             sector_number, trade_start_date, before_period_days, end_date, data_numbers
@@ -28,14 +27,11 @@ def main():
     )
     training_features_df = features_df_for_train.drop(columns=["Symbol"])
     model_predict_features_df = features_df_for_evaluation.drop(columns=["Symbol"])
-    end_time_features = time.time()
-    print(
-        f"データ取得、学習データ、特徴量、ラベルの生成 処理時間: {end_time_features - start_time_features:.2f}秒"
-    )
 
-    # --------------------------データの準備
+    # --------------------------トレインデータの準備
     X_train, X_test, y_train, y_test = prepare_data(training_features_df)
 
+    # --------------------------モデルのトレーニングと評価
     model_types = [
         "lightgbm",
         "rand_frst",
@@ -73,6 +69,8 @@ def main():
     print(results_df)
 
     # アンサンブル評価を実行
+    print("ﾝ―((･ω｀･；三；･´ω･))―ﾝ アンサンブル評価を実行 ｩ──σ(´･д･`; )──ﾝ")
+
     evaluate_ensemble(all_symbol_signals, model_predict_features_df, symbol_data_dict)
 
 

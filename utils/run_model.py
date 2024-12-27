@@ -17,8 +17,8 @@ def run_model(
     symbol_data_dict,
     results,
 ):
-    print("----------------------------------------")
-    print(f"実行中のモデルタイプ: {model_type}")
+
+    print(f"<----------- モデル: {model_type} ------------>")
 
     # --------------------------モデルのトレーニング
     start_time_train = time.time()
@@ -31,6 +31,7 @@ def run_model(
 
     # --------------------------保存されたモデルを読み込んで評価
     loaded_model = load_model(model_type)
+
     (
         symbol_signals,
         tp,

@@ -3,6 +3,8 @@ from ensemble_methods.extract_duplicate_values import extract_duplicate_values
 from ensemble_methods.convert_to_binary_predictions import convert_to_binary_predictions
 from itertools import combinations
 from ensemble_methods.plot_ensemble_results import plot_ensemble_results
+import time
+from utils.save_signals_to_csv import save_signals_to_csv
 
 
 def evaluate_ensemble(all_symbol_signals, model_predict_features_df, symbol_data_dict):
@@ -13,6 +15,9 @@ def evaluate_ensemble(all_symbol_signals, model_predict_features_df, symbol_data
     :param symbol_data_dict: シンボルデータ辞書（日次データ）
     :return: Precisionの高いベスト5の組み合わせと予測データ
     """
+
+    start_time_ensemble = time.time()
+
     ensemble_results = []  # プロット用に、アンサンブル結果を格納するリスト
     precision_results = []
 
@@ -71,7 +76,7 @@ def evaluate_ensemble(all_symbol_signals, model_predict_features_df, symbol_data
         :10
     ]
 
-    # ベスト5のモデルの組み合わせと予測データを表示
+    # ベスト 10 のモデルの組み合わせと予測データを表示
     for result in precision_results:
         combination, metrics, duplicated_values = result
         (
@@ -104,13 +109,20 @@ def evaluate_ensemble(all_symbol_signals, model_predict_features_df, symbol_data
         print(f"NPV [TN / (TN + FN)]: {npv:.4f}")
         print("----------------------------------------------")
 
-        # プロットも行う場合
-        # for symbol in symbols:
-        #     plot_ensemble_results(
-        #         symbol_data_dict[symbol],
-        #         model_predict_features_df.loc[test_indices],
-        #         y_pred_binary.loc[test_indices],
-        #         symbol,
-        #     )
+    # プロットも行う場合
+    # for symbol in symbols:
+    #     plot_ensemble_results(
+    #         symbol_data_dict[symbol],
+    #         model_predict_features_df.loc[test_indices],
+    #         y_pred_binary.loc[test_indices],
+    #         symbol,
+    #     )
+
+    save_signals_to_csv(precision_results)  # シグナル日をCSVに保存
+
+    end_time_ensemble = time.time()
+    print(
+        f"アンサンブル評価の処理時間: {end_time_ensemble - start_time_ensemble:.2f}秒"
+    )
 
     return precision_results
