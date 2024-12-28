@@ -9,4 +9,4 @@ def save_model(model, model_type, directory="trained_models"):
     filename = f"trained_model_{model_type}.pkl"
     filepath = os.path.join(directory, filename)
     joblib.dump(model, filepath)
-    print(f"モデルを {filepath} に保存しました")
+    # print(f"モデルを {filepath} に保存しました")

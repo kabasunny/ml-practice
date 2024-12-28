@@ -77,7 +77,7 @@ def evaluate_ensemble(all_symbol_signals, model_predict_features_df, symbol_data
     ]
 
     # ベスト 10 のモデルの組み合わせと予測データを表示
-    for result in precision_results:
+    for rank, result in enumerate(precision_results, start=1):
         combination, metrics, duplicated_values = result
         (
             accuracy,
@@ -92,8 +92,10 @@ def evaluate_ensemble(all_symbol_signals, model_predict_features_df, symbol_data
             FN,
             total_tests,
         ) = metrics
+        print(f"順位: {rank}")
         print(f"モデルの組み合わせ: {combination}")
-        print(f"Precision: {precision:.4f}")
+        print(f"組み合わせモデル数: {len(combination)}")
+        print(f"評価指標: [ Precision: {precision:.4f}, F1 Score: {f1_score:.4f} ]")
         print(f"True Positives  (TP): {TP:.0f}")
         print(f"True Negatives  (TN): {TN:.0f}")
         print(f"False Positives (FP): {FP:.0f}")

@@ -5,11 +5,11 @@ import numpy as np
 
 
 def model_predict(
-    model, model_predict_features_df, features_df_for_evaluation, symbol_data_dict
+    model, predict_features_df, features_df_for_evaluation, symbol_data_dict
 ):
-    # モデルの予測と結果の確認
-    X_test = model_predict_features_df.drop("Label", axis=1)  # 説明変数
-    y_test = model_predict_features_df["Label"]  # 目的変数
+    # トレーニングモデルの予測と結果の確認
+    X_test = predict_features_df.drop("Label", axis=1)  # 説明変数
+    y_test = predict_features_df["Label"]  # 目的変数
 
     # モデルが predict_proba を持っているか確認
     if hasattr(model, "predict_proba"):
@@ -26,7 +26,7 @@ def model_predict(
             "Predicted": y_pred_binary,
             "Symbol": features_df_for_evaluation["Symbol"],
         },
-        index=model_predict_features_df.index,
+        index=predict_features_df.index,
     )
 
     # カスタムの評価を呼び出す

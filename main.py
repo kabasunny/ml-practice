@@ -26,7 +26,7 @@ def main():
         )
     )
     training_features_df = features_df_for_train.drop(columns=["Symbol"])
-    model_predict_features_df = features_df_for_evaluation.drop(columns=["Symbol"])
+    predict_features_df = features_df_for_evaluation.drop(columns=["Symbol"])
 
     # --------------------------トレインデータの準備
     X_train, X_test, y_train, y_test = prepare_data(training_features_df)
@@ -55,7 +55,7 @@ def main():
             X_test,
             y_train,
             y_test,  # トレーニング評価用の正解ラベル
-            model_predict_features_df,  # 実践用正解ラベルはここから抽出する
+            predict_features_df,  # 実践用正解ラベルはここから抽出する
             features_df_for_evaluation,
             symbol_data_dict,
             results,
@@ -71,7 +71,7 @@ def main():
     # アンサンブル評価を実行
     print("ﾝ―((･ω｀･；三；･´ω･))―ﾝ アンサンブル評価を実行 ｩ──σ(´･д･`; )──ﾝ")
 
-    evaluate_ensemble(all_symbol_signals, model_predict_features_df, symbol_data_dict)
+    evaluate_ensemble(all_symbol_signals, predict_features_df, symbol_data_dict)
 
 
 if __name__ == "__main__":

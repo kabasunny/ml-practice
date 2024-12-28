@@ -12,7 +12,7 @@ def run_model(
     X_test,
     y_train,
     y_test,
-    model_predict_features_df,
+    predict_features_df,
     features_df_for_evaluation,
     symbol_data_dict,
     results,
@@ -29,7 +29,8 @@ def run_model(
     # モデルを保存
     save_model(model, model_type)
 
-    # --------------------------保存されたモデルを読み込んで評価
+    # --------------------------トレインドモデルの評価
+    # モデルを読み込み
     loaded_model = load_model(model_type)
 
     (
@@ -47,7 +48,7 @@ def run_model(
         _,
     ) = model_predict(
         loaded_model,
-        model_predict_features_df,
+        predict_features_df,
         features_df_for_evaluation,
         symbol_data_dict,
     )
